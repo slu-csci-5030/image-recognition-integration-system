@@ -12,7 +12,7 @@ export default function ImageDisplay({ src, alt, width, height, caption }: Image
   return (
     <div className="max-w-sm rounded overflow-hidden shadow-lg">
       <div className="relative" style={{ width: `${width}px`, height: `${height}px` }}>
-        <Image src={src || "/placeholder.svg"} alt={alt} layout="fill" objectFit="cover" />
+        <Image src={src || "/placeholder.svg"} alt={alt} fill style = {{ objectFit: "cover" }} />
       </div>
       {caption && (
         <div className="px-6 py-4">
