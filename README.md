@@ -20,7 +20,7 @@ IRIS is built using the following technologies:
 
 - **Next.js** – Frontend framework for building user interfaces.
 - **React** – Component-based UI library.
-- **TailwindCSS** – utility-first CSS framework. 
+- **TailwindCSS** – utility-first CSS framework.
 - **Python** – Core programming language for backend development.
 - **TensorFlow / PyTorch** – For integrating pre-trained image recognition models.
 - **Docker** – Containerization for deployment consistency.
@@ -43,7 +43,7 @@ Clone the repository:
 
 ```sh
 git clone https://github.com/oss-slu/image-recognition-integration-system.git
-cd IRIS
+cd image-recognition-integration-system
 ```
 
 Install dependencies:
@@ -85,6 +85,7 @@ To learn more about Next.js, take a look at the following resources:
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 - [Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
 ---
 
 ## Contributing
