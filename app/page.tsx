@@ -4,8 +4,6 @@ import CameraButton from "@/components/cameraButton";
 export default function Home() {
   return (
     <div className="flex items-center justify-center h-screen relative">
-      <div className="absolute top-4 left-4 w-8 h-8 bg-gray-300 rounded"></div>
-
       <div className="flex flex-col items-center">
         <main className="w-80 h-80 border-2 border-gray-300 rounded-lg overflow-hidden shadow-lg flex items-center justify-center bg-black-100">
           <Image
