@@ -1,4 +1,4 @@
-import ImageGrid from "../../components/imageGrid"
+import ImageGrid from "../components/imageGrid"
 
 const sampleImages = [
   { src: "/assets/cat.jpg", alt: "Sample Image 1", caption: "Image 1" },
