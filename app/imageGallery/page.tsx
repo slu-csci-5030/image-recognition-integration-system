@@ -47,7 +47,16 @@ export default function ImageGallery() {
     const sendPhotoToAPI = async (base64Image: string) => {
         setIsUploading(true);
         try {
-            const { data } = await axios.post("/api/upload", { image: base64Image });
+            const { data } = await axios.post(
+                "http://192.168.123.110:5000/search",
+                 { image: base64Image },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                    withCredentials: false,
+                });
 
             if (data?.similar_images && Array.isArray(data.similar_images)) {
                 const formattedImages = data.similar_images.map((url: string, index: number) => ({
