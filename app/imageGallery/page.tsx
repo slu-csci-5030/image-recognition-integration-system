@@ -9,11 +9,40 @@ export default function ImageGallery() {
     const [isUploading, setIsUploading] = useState(false);
 
     useEffect(() => {
-        const storedImage = localStorage.getItem("capturedImage");
-        if (storedImage) {
-            sendPhotoToAPI(storedImage);
-        }
+        retrieveImageFromIndexedDB();
     }, []);
+
+    const retrieveImageFromIndexedDB = () => {
+        return new Promise<void>((resolve, reject) => {
+            const request = indexedDB.open("ImageStorageDB", 1);
+
+            request.onsuccess = () => {
+                const db = request.result;
+                const transaction = db.transaction("images", "readonly");
+                const store = transaction.objectStore("images");
+                const getRequest = store.get("capturedImage");
+
+                getRequest.onsuccess = async () => {
+                    if (getRequest.result) {
+                        const base64Image = getRequest.result.data;
+                        await sendPhotoToAPI(base64Image);
+                        resolve();
+                    } else {
+                        console.warn("No image found in IndexedDB.");
+                        reject("No image found");
+                    }
+                };
+
+                getRequest.onerror = () => {
+                    reject("Error retrieving image from IndexedDB.");
+                };
+            };
+
+            request.onerror = () => {
+                reject("IndexedDB access failed.");
+            };
+        });
+    };
 
     const sendPhotoToAPI = async (base64Image: string) => {
         setIsUploading(true);

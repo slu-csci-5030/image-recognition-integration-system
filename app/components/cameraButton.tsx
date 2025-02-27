@@ -30,8 +30,7 @@ const CameraButton = () => {
 
             console.log("Base64 image:", base64Image);
             // Store Base64 image in localStorage
-            localStorage.setItem("capturedImage", base64Image);
-
+            await storeImageInIndexedDB(base64Image);
             // Send to Next.js API
 
             // Redirect to Image Gallery
@@ -61,7 +60,32 @@ const CameraButton = () => {
                 .catch(error => reject(error));
         });
     };
-
+    const storeImageInIndexedDB = (base64Image: string) => {
+        return new Promise<void>((resolve, reject) => {
+            const request = indexedDB.open("ImageStorageDB", 1);
+    
+            request.onupgradeneeded = (event) => {
+                const db = request.result;
+                if (!db.objectStoreNames.contains("images")) {
+                    db.createObjectStore("images", { keyPath: "id" });
+                }
+            };
+    
+            request.onsuccess = () => {
+                const db = request.result;
+                const transaction = db.transaction("images", "readwrite");
+                const store = transaction.objectStore("images");
+    
+                store.put({ id: "capturedImage", data: base64Image });
+    
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = (error) => reject(error);
+            };
+    
+            request.onerror = (error) => reject(error);
+        });
+    };
+    
    
 
     return (
