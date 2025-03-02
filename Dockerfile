@@ -15,7 +15,7 @@ COPY . .
 RUN yarn build
 
 # ---- Stage 2: Production image ----
-FROM node:16-alpine AS runner
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
