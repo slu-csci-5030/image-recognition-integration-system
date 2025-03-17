@@ -1,4 +1,4 @@
-// Add required test utilities
+// jest.setup.js
 import '@testing-library/jest-dom';
 
 // Mock window.matchMedia
@@ -50,7 +50,7 @@ jest.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
-// Mock console.error and warn to not pollute test output
+// Suppress React warnings in tests
 const originalConsoleError = console.error;
 const originalConsoleWarn = console.warn;
 
@@ -70,3 +70,4 @@ console.warn = (...args) => {
   }
   originalConsoleWarn(...args);
 };
+
