@@ -8,13 +8,15 @@ assignees: ''
 
 ## User Story
 
-As a [role], I want [feature], so that [benefit].
+As a [role],
+I want [feature],
+so that [benefit].
 
 ## Acceptance Criteria
 
-- [ ] Criterion 1: [Description]
-- [ ] Criterion 2: [Description]
-- [ ] Criterion 3: [Description]
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
 
 ## Additional Context
 
