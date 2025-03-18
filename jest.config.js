@@ -11,7 +11,13 @@ const customJestConfig = {
   // Use jest-environment-jsdom for browser-like testing
   testEnvironment: 'jest-environment-jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  moduleNameMapper: {
+    // Handle module aliases
+    '^@/components/(.*)$': '<rootDir>/components/$1',
+    '^@/app/(.*)$': '<rootDir>/app/$1',
+  },
 };
 
-// createJestConfig is exported to ensure that Next.js' babel configuration is applied
+// createJestConfig is exported to ensure that Next.js' Babel configuration is applied
 module.exports = createJestConfig(customJestConfig);
+
