@@ -25,6 +25,7 @@ jobs:
         with:
           node-version: '20'
 
+      - name : in
       - name: Install Yarn
         run: npm install -g yarn
 
@@ -45,13 +46,17 @@ jobs:
         platform: [android]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '20'
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
 
       - name: Install Yarn
         run: npm install -g yarn
