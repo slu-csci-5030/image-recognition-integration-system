@@ -1,6 +1,7 @@
 import Image from "next/image";
 import CameraButton from "@/app/components/cameraButton";
-import NavigationBar from "@/app/components/navigationBar"
+import NavigationBar from "@/app/components/navigationBar";
+import LoginScreen from "@/app/screens/authscreens/LoginScreen";
 
 export default function Home() {
   return (

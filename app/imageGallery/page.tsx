@@ -48,7 +48,7 @@ export default function ImageGallery() {
         setIsUploading(true);
         try {
             const { data } = await axios.post(
-                "http://192.168.123.110:5000/search",
+                "http://68.191.197.115:500/search",
                  { image: base64Image },
                 {
                     headers: {
