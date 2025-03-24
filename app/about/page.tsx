@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 
-const About: React.FC = () => {
+export default function About() {
   return (
     <div className="p-8 max-w-2xl mx-auto bg-grey rounded-xl shadow-md space-y-10">
       <h1 className="text-2xl font-bold">About This App</h1>
@@ -30,4 +30,3 @@ const About: React.FC = () => {
   );
 };
 
-export default About;
