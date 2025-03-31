@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import ImageGrid from "../components/imageGrid";
-import Spinner from "../components/spinner";
 import axios from "axios";
 
 interface StoredImage {
@@ -31,29 +29,42 @@ export default function ImageGallery() {
     }, [imageId]);
 
     const loadStoredImages = () => {
-        const request = indexedDB.open("ImageStorageDB", 1);
+        return new Promise<void>((resolve, reject) => {
+            const request = indexedDB.open("ImageStorageDB", 1);
 
-        request.onsuccess = () => {
-            const db = request.result;
-            const transaction = db.transaction("images", "readonly");
-            const store = transaction.objectStore("images");
-            const getAllRequest = store.getAll();
+            request.onsuccess = () => {
+                const db = request.result;
+                const transaction = db.transaction("images", "readonly");
+                const store = transaction.objectStore("images");
+                
+                // Use getAll for simpler retrieval
+                const getAllRequest = store.getAll();
 
-            getAllRequest.onsuccess = () => {
-                const images = getAllRequest.result.map(img => ({
-                    id: img.id,
-                    data: img.data,
-                    timestamp: img.timestamp || 'Unknown date'
-                }));
-                
-                // Sort by timestamp, newest first
-                images.sort((a, b) => 
-                    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-                );
-                
-                setStoredImages(images);
+                getAllRequest.onsuccess = (event) => {
+                    const images = (event.target as IDBRequest).result || [];
+                    
+                    // Sort images by timestamp, newest first
+                    const sortedImages = images.sort((a, b) => 
+                        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+                    );
+                    
+                    setStoredImages(sortedImages.map(image => ({
+                        id: image.id,
+                        data: image.data,
+                        timestamp: image.timestamp || 'Unknown date'
+                    })));
+                    resolve();
+                };
+
+                getAllRequest.onerror = () => {
+                    reject(new Error("Error retrieving images from IndexedDB"));
+                };
             };
-        };
+
+            request.onerror = () => {
+                reject(new Error("IndexedDB access failed"));
+            };
+        });
     };
 
     const retrieveSpecificImageFromIndexedDB = (id: string) => {
@@ -73,6 +84,7 @@ export default function ImageGallery() {
                         resolve();
                     } else {
                         console.warn("No image found in IndexedDB with ID:", id);
+                        setImages([]); // Clear images
                         reject("No image found");
                     }
                 };
@@ -116,9 +128,11 @@ export default function ImageGallery() {
                 setImages(formattedImages);
             } else {
                 console.error("Unexpected API response format:", data);
+                setImages([]); // Ensure images are cleared on unexpected response
             }
         } catch (error) {
             console.error("Error uploading image:", error);
+            setImages([]); // Ensure images are cleared on error
         } finally {
             setIsUploading(false);
         }
@@ -134,9 +148,9 @@ export default function ImageGallery() {
             <main>
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                     {/* Previously captured images gallery */}
-                    {storedImages.length > 0 && (
+                    {storedImages.length > 0 ? (
                         <div className="mb-8">
-                            <h2 className="text-xl font-semibold mb-4 text-black">Images</h2>
+                            <h2 className="text-xl font-semibold mb-4">Your Captured Images</h2>
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                 {storedImages.map((image) => (
                                     <div 
@@ -155,7 +169,11 @@ export default function ImageGallery() {
                                 ))}
                             </div>
                         </div>
+                    ) : (
+                        <div className="text-center text-gray-500">No images found.</div>
                     )}
+
+
                 </div>
             </main>
         </div>
