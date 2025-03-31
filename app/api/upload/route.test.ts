@@ -1,18 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest} from 'next/server';
 import axios from 'axios';
 import { POST } from './route'; // Adjust the path as needed
 
 // Mock Next.js components
 jest.mock('next/server', () => ({
   NextRequest: jest.fn(),
-  NextResponse: {
-    json: jest.fn().mockImplementation((body, options) => {
-      return {
-        status: options?.status || 200,
-        json: async () => body
-      };
-    })
-  }
 }));
 
 // Mock axios

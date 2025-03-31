@@ -141,9 +141,11 @@ function ImageGalleryContent() {
             </header>
             <main>
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                    {isUploading && <div className="text-center text-gray-500">Click to Search for similar images</div>}
+
                     {storedImages.length > 0 ? (
                         <div className="mb-8">
-                            <h2 className="text-xl font-semibold text-black mb-4">Your Captured Images</h2>
+                            <h2 className="text-xl font-semibold text-black mb-4">Images</h2>
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                 {storedImages.map((image) => (
                                     <div
@@ -164,6 +166,17 @@ function ImageGalleryContent() {
                         </div>
                     ) : (
                         <div className="text-center text-gray-500">No images found.</div>
+                    )}
+
+                    {images.length > 0 && (
+                        <div className="mt-8">
+                            <h2 className="text-xl font-semibold text-black mb-4">Similar Images</h2>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                {images.map((image) => (
+                                    <img key={image.src} src={image.src} alt={image.alt} className="object-cover w-full h-40 rounded-md" />
+                                ))}
+                            </div>
+                        </div>
                     )}
                 </div>
             </main>

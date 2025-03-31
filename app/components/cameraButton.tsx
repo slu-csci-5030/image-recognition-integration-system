@@ -65,13 +65,6 @@ const CameraButton = () => {
         return new Promise<void>((resolve, reject) => {
             const request = indexedDB.open("ImageStorageDB", 1);
     
-            request.onupgradeneeded = (event) => {
-                const db = request.result;
-                if (!db.objectStoreNames.contains("images")) {
-                    db.createObjectStore("images", { keyPath: "id" });
-                }
-            };
-    
             request.onsuccess = () => {
                 const db = request.result;
                 const transaction = db.transaction("images", "readwrite");
