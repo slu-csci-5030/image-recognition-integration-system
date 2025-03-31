@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import axios from "axios";
 
@@ -10,21 +10,18 @@ interface StoredImage {
     timestamp: string;
 }
 
-export default function ImageGallery() {
+function ImageGalleryContent() {
     const searchParams = useSearchParams();
     const imageId = searchParams.get("imageId");
-    
+
     const [images, setImages] = useState<{ src: string; alt: string }[]>([]);
     const [isUploading, setIsUploading] = useState(false);
     const [storedImages, setStoredImages] = useState<StoredImage[]>([]);
 
     useEffect(() => {
         if (imageId) {
-            // If an imageId is provided, retrieve and process that specific image
             retrieveSpecificImageFromIndexedDB(imageId);
         }
-        
-        // Also load list of all stored images
         loadStoredImages();
     }, [imageId]);
 
@@ -36,22 +33,19 @@ export default function ImageGallery() {
                 const db = request.result;
                 const transaction = db.transaction("images", "readonly");
                 const store = transaction.objectStore("images");
-                
-                // Use getAll for simpler retrieval
-                const getAllRequest = store.getAll();
 
+                const getAllRequest = store.getAll();
                 getAllRequest.onsuccess = (event) => {
                     const images = (event.target as IDBRequest).result || [];
-                    
-                    // Sort images by timestamp, newest first
-                    const sortedImages = images.sort((a, b) => 
+
+                    const sortedImages = images.sort((a: StoredImage, b: StoredImage) =>
                         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
                     );
-                    
-                    setStoredImages(sortedImages.map(image => ({
+
+                    setStoredImages(sortedImages.map((image: StoredImage) => ({
                         id: image.id,
                         data: image.data,
-                        timestamp: image.timestamp || 'Unknown date'
+                        timestamp: image.timestamp || "Unknown date"
                     })));
                     resolve();
                 };
@@ -84,7 +78,7 @@ export default function ImageGallery() {
                         resolve();
                     } else {
                         console.warn("No image found in IndexedDB with ID:", id);
-                        setImages([]); // Clear images
+                        setImages([]);
                         reject("No image found");
                     }
                 };
@@ -106,8 +100,8 @@ export default function ImageGallery() {
 
     const sendPhotoToAPI = async (base64Image: string) => {
         setIsUploading(true);
-        setImages([]); // Clear previous results
-        
+        setImages([]);
+
         try {
             const { data } = await axios.post(
                 "http://192.168.123.110:5000/search",
@@ -128,11 +122,11 @@ export default function ImageGallery() {
                 setImages(formattedImages);
             } else {
                 console.error("Unexpected API response format:", data);
-                setImages([]); // Ensure images are cleared on unexpected response
+                setImages([]);
             }
         } catch (error) {
             console.error("Error uploading image:", error);
-            setImages([]); // Ensure images are cleared on error
+            setImages([]);
         } finally {
             setIsUploading(false);
         }
@@ -142,25 +136,24 @@ export default function ImageGallery() {
         <div className="min-h-screen bg-gray-100">
             <header className="bg-white shadow">
                 <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Image Gallery</h1>
+                    <h1 className="text-3xl font-bold text-black">Image Gallery</h1>
                 </div>
             </header>
             <main>
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                    {/* Previously captured images gallery */}
                     {storedImages.length > 0 ? (
                         <div className="mb-8">
-                            <h2 className="text-xl font-semibold mb-4">Your Captured Images</h2>
+                            <h2 className="text-xl font-semibold text-black mb-4">Your Captured Images</h2>
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                 {storedImages.map((image) => (
-                                    <div 
-                                        key={image.id} 
+                                    <div
+                                        key={image.id}
                                         className="border rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                                         onClick={() => loadImageById(image.id)}
                                     >
                                         <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden">
-                                            <img 
-                                                src={image.data} 
+                                            <img
+                                                src={image.data}
                                                 alt="Captured image"
                                                 className="object-cover w-full h-40"
                                             />
@@ -172,10 +165,16 @@ export default function ImageGallery() {
                     ) : (
                         <div className="text-center text-gray-500">No images found.</div>
                     )}
-
-
                 </div>
             </main>
         </div>
+    );
+}
+
+export default function ImageGallery() {
+    return (
+        <Suspense fallback={<div className="text-black text-center">Loading...</div>}>
+            <ImageGalleryContent />
+        </Suspense>
     );
 }
