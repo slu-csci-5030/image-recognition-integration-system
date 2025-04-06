@@ -7,10 +7,12 @@ interface ImageItem {
 }
 
 interface ImageGridProps {
-  images: ImageItem[]
-}
+    images: ImageItem[]
+    captionBgClass?: string
+    captionTextClass?: string
+  }
 
-export default function ImageGrid({ images }: ImageGridProps) {
+export default function ImageGrid({ images, captionBgClass = "bg-black bg-opacity-50", captionTextClass = "text-white" }: ImageGridProps) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4">
 
@@ -24,7 +26,7 @@ export default function ImageGrid({ images }: ImageGridProps) {
             style={{ objectFit: "cover" }}
           />
           {image.caption && (
-            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm">
+            <div className={`absolute bottom-0 left-0 right-0 p-2 text-sm ${captionBgClass} ${captionTextClass} rounded-b-md backdrop-blur-sm`}>
               {image.caption}
             </div>
           )}
