@@ -4,8 +4,15 @@ import { POST } from './route'; // Adjust the path as needed
 
 // Mock Next.js components
 jest.mock('next/server', () => ({
-  NextRequest: jest.fn(),
-}));
+    NextRequest: jest.fn(),
+    NextResponse: {
+      json: jest.fn((data: any, init?: any) => ({
+        json: () => data,
+        status: init?.status || 200
+      }))
+    }
+  }));
+  
 
 // Mock axios
 jest.mock('axios');
