@@ -6,6 +6,27 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  safelist: [
+    // Text colors
+    "text-cyan-300",
+    "text-red-500",
+    "text-blue-500",
+    "text-gray-200",
+    "text-gray-300",
+
+    // Backgrounds
+    "bg-gray-800",
+    "bg-gray-900",
+    "bg-blue-500",
+    "bg-red-500",
+    "bg-cyan-500",
+    "bg-indigo-600",
+    "hover:bg-indigo-700",
+
+    // Borders
+    "border-gray-700",
+    "border-blue-700"
+  ],
   theme: {
     extend: {
       colors: {

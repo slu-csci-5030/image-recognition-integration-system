@@ -4,6 +4,7 @@ import { Camera, CameraResultType } from "@capacitor/camera";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import config from "@/config/Setup.json";
 
 const CameraButton = () => {
     const router = useRouter();
@@ -64,20 +65,35 @@ const CameraButton = () => {
     const storeImageInIndexedDB = (imageId: string, base64Image: string) => {
         return new Promise<void>((resolve, reject) => {
             const request = indexedDB.open("ImageStorageDB", 1);
+
+            request.onupgradeneeded = () => {
+                const db = request.result;
+    
+                // Only create object store if it doesn't exist
+                if (!db.objectStoreNames.contains("images")) {
+                    db.createObjectStore("images", { keyPath: "id" });
+                }
+            };
     
             request.onsuccess = () => {
                 const db = request.result;
+    
+                // Start a transaction to store the image
                 const transaction = db.transaction("images", "readwrite");
                 const store = transaction.objectStore("images");
-    
-                // Store with UUID as id
-                store.put({ id: imageId, data: base64Image, timestamp: new Date().toISOString() });
+                
+                // Store the image with the generated UUID as the key
+                store.put({
+                    id: imageId,
+                    data: base64Image,
+                    timestamp: new Date().toISOString(),
+                });
     
                 transaction.oncomplete = () => resolve();
-                transaction.onerror = (error) => reject(error);
+                transaction.onerror = (event) => reject(event);
             };
     
-            request.onerror = (error) => reject(error);
+            request.onerror = (event) => reject(event);
         });
     };
 

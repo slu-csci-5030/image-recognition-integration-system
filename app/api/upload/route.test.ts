@@ -1,10 +1,15 @@
-import { NextRequest} from 'next/server';
+import { POST } from './route';
 import axios from 'axios';
-import { POST } from './route'; // Adjust the path as needed
+import { NextRequest } from 'next/server';
 
-// Mock Next.js components
+// Fully mock NextResponse only — no requireActual
 jest.mock('next/server', () => ({
-  NextRequest: jest.fn(),
+  NextResponse: {
+    json: (data: unknown, init?: { status?: number }) => ({
+      json: () => data,
+      status: init?.status ?? 200,
+    }),
+  },
 }));
 
 // Mock axios
@@ -17,36 +22,38 @@ describe('Image Search API Route', () => {
   });
 
   test('should return similar images when provided with a valid image', async () => {
-    // Mock the API response
     mockedAxios.post.mockResolvedValueOnce({
       data: {
-        similar_images: ['http://example.com/image1.jpg', 'http://example.com/image2.jpg']
-      }
+        similar_images: [
+          'http://example.com/image1.jpg',
+          'http://example.com/image2.jpg',
+        ],
+      },
     });
 
-    // Create a mock request
     const mockRequest = {
       json: jest.fn().mockResolvedValueOnce({
-        image: 'data:image/jpeg;base64,/9j/4AAQSkZJRg=='
-      })
+        image: 'data:image/jpeg;base64,/9j/4AAQSkZJRg==',
+      }),
     } as unknown as NextRequest;
 
-    // Call the API route handler
     const response = await POST(mockRequest);
     const responseData = await response.json();
 
-    // Check the response
     expect(response.status).toBe(200);
     expect(responseData).toEqual({
-      similar_images: ['http://example.com/image1.jpg', 'http://example.com/image2.jpg']
+      similar_images: [
+        'http://example.com/image1.jpg',
+        'http://example.com/image2.jpg',
+      ],
     });
-    
-    // Verify that axios was called with the correct parameters
+
     expect(mockedAxios.post).toHaveBeenCalledWith(
       expect.stringContaining('api.shniter.com:5000/search'),
       { image: 'data:image/jpeg;base64,/9j/4AAQSkZJRg==' }
     );
   });
-
-  // Additional tests can be updated similarly
 });
+    
+    
+    
