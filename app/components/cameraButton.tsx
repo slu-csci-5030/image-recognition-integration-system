@@ -4,6 +4,7 @@ import { Camera, CameraResultType } from "@capacitor/camera";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import config from "@/config/Setup.json";
 
 const CameraButton = () => {
     const router = useRouter();
