@@ -1,8 +1,10 @@
 const fs = require('fs');
 const plist = require('plist');
-
+const path = require('path');
 // Get version from package.json
-const { version } = require('../../package.json');
+const { version } = require(path.resolve(__dirname, '../../package.json'));
+
+
 
 // ------------- Update Android build.gradle -------------
 const androidBuildGradlePath = './android/app/build.gradle';
