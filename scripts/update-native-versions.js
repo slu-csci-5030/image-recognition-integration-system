@@ -1,9 +1,19 @@
 const fs = require('fs');
-const plist = require('plist');
 const path = require('path');
-// Get version from package.json
-const { version } = require(path.resolve(__dirname, '../../package.json'));
+const plist = require('plist');
 
+// Use fs + path to reliably read package.json
+const packageJsonPath = path.resolve(__dirname, '../package.json');
+const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf-8');
+const packageJson = JSON.parse(packageJsonContent);
+
+// Confirm version is present
+if (!packageJson.version) {
+  console.error('❌ Error: version not found in package.json');
+  process.exit(1);
+}
+
+const version = packageJson.version;
 
 
 // ------------- Update Android build.gradle -------------
