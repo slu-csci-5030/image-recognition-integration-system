@@ -58,7 +58,8 @@ jobs:
 
       - name: Build Android AAB
         run: |
-          npx cap sync android
+          yarn build
+          yarn cap sync android
           cd android
           ./gradlew bundleRelease
 
@@ -70,58 +71,58 @@ jobs:
           asset_name: app-release-${{ needs.release.outputs.release_version }}.aab
           asset_content_type: application/octet-stream
 
-  ios-build:
-    needs: release
-    runs-on: macos-13
+  # ios-build:
+  #   needs: release
+  #   runs-on: macos-13
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+  #     - name: Set up Node.js
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '20'
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+  #     - name: Install dependencies
+  #       run: yarn install --frozen-lockfile
 
-      - name: Install CocoaPods
-        run: cd ios/App && pod install
+  #     - name: Install CocoaPods
+  #       run: cd ios/App && pod install
 
-      - name: Setup Keychain and Provisioning
-        run: |
-          echo "${{ secrets.IOS_CERTIFICATE }}" | base64 --decode > cert.p12
-          echo "${{ secrets.IOS_PROFILE }}" | base64 --decode > profile.mobileprovision
-          security create-keychain -p "" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
-          security import cert.p12 -P ${{ secrets.IOS_CERTIFICATE_PASSWORD }} -A
-          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+  #     - name: Setup Keychain and Provisioning
+  #       run: |
+  #         echo "${{ secrets.IOS_CERTIFICATE }}" | base64 --decode > cert.p12
+  #         echo "${{ secrets.IOS_PROFILE }}" | base64 --decode > profile.mobileprovision
+  #         security create-keychain -p "" build.keychain
+  #         security default-keychain -s build.keychain
+  #         security unlock-keychain -p "" build.keychain
+  #         security import cert.p12 -P ${{ secrets.IOS_CERTIFICATE_PASSWORD }} -A
+  #         security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+  #         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+  #         cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
-      - name: Build iOS Archive
-        run: |
-          cd ios/App
-          xcodebuild -workspace App.xcworkspace \
-            -scheme App \
-            -configuration Release \
-            -archivePath $PWD/build/App.xcarchive \
-            -allowProvisioningUpdates archive
+  #     - name: Build iOS Archive
+  #       run: |
+  #         cd ios/App
+  #         xcodebuild -workspace App.xcworkspace \
+  #           -scheme App \
+  #           -configuration Release \
+  #           -archivePath $PWD/build/App.xcarchive \
+  #           -allowProvisioningUpdates archive
 
-      - name: Export IPA
-        run: |
-          cd ios/App
-          xcodebuild -exportArchive \
-            -archivePath $PWD/build/App.xcarchive \
-            -exportOptionsPlist exportOptions.plist \
-            -exportPath $PWD/build/IPA
+  #     - name: Export IPA
+  #       run: |
+  #         cd ios/App
+  #         xcodebuild -exportArchive \
+  #           -archivePath $PWD/build/App.xcarchive \
+  #           -exportOptionsPlist exportOptions.plist \
+  #           -exportPath $PWD/build/IPA
 
-      - name: Upload iOS Artifact
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ needs.release.outputs.release_url }}
-          asset_path: ios/App/build/IPA/App.ipa
-          asset_name: App-${{ needs.release.outputs.release_version }}.ipa
-          asset_content_type: application/octet-stream
+  #     - name: Upload iOS Artifact
+  #       uses: actions/upload-release-asset@v1
+  #       with:
+  #         upload_url: ${{ needs.release.outputs.release_url }}
+  #         asset_path: ios/App/build/IPA/App.ipa
+  #         asset_name: App-${{ needs.release.outputs.release_version }}.ipa
+  #         asset_content_type: application/octet-stream
