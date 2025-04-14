@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/oss-slu/image-recognition-integration-system/compare/v1.1.0...v1.1.1) (2025-04-14)
+
+
+### Bug Fixes
+
+* fixed an error in the setup json sintax ([241d044](https://github.com/oss-slu/image-recognition-integration-system/commit/241d044c17ba954b16ced9fade7c15cdcbbca989))
+
 # 1.0.0 (2025-04-08)
 
 
