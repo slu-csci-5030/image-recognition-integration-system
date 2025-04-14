@@ -1,3 +1,16 @@
+# [1.2.0](https://github.com/oss-slu/image-recognition-integration-system/compare/v1.1.1...v1.2.0) (2025-04-14)
+
+
+### Bug Fixes
+
+* changed the way the config is imported into the app ([82d7fb7](https://github.com/oss-slu/image-recognition-integration-system/commit/82d7fb70ee98204a17830f2979d9dc217a8a7a48))
+
+
+### Features
+
+* changed the api on setup.json and renamed the file ([44c42f3](https://github.com/oss-slu/image-recognition-integration-system/commit/44c42f39149d86fd9bd1d705d48cd2c6a88da731))
+* made the navbar display on every page ([c927fbe](https://github.com/oss-slu/image-recognition-integration-system/commit/c927fbe1afaedec0e19d66849a5616d579f69cf3))
+
 ## [1.1.1](https://github.com/oss-slu/image-recognition-integration-system/compare/v1.1.0...v1.1.1) (2025-04-14)
 
 
