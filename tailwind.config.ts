@@ -5,6 +5,7 @@ const config: Config = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    './config/**/*.{js,ts,json}',
   ],
   safelist: [
     // Text colors
@@ -19,6 +20,7 @@ const config: Config = {
     "bg-gray-900",
     "bg-blue-500",
     "bg-red-500",
+    "bg-green-500", 
     "bg-cyan-500",
     "bg-indigo-600",
     "hover:bg-indigo-700",

@@ -2,17 +2,28 @@
 
 import { Camera, CameraResultType } from "@capacitor/camera";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, use } from "react";
 import { v4 as uuidv4 } from "uuid";
-
-import { config } from "../config";
-
+import { AppConfig } from "@/types/config";
 
 
 const CameraButton = () => {
     const router = useRouter();
     const [isCapturing, setIsCapturing] = useState(false);
+    const [config, setConfig] = useState<AppConfig | null>(null);
 
+    useEffect(() => {
+        fetch(`/api/config`)
+            .then((response) => response.json())
+            .then((data) => {
+                setConfig(data);
+            })
+            .catch((error) => {
+                console.error("Error loading config:", error);
+            });
+    }
+    , []);
+   
     const takePhoto = async () => {
         try {
             setIsCapturing(true);
@@ -102,7 +113,7 @@ const CameraButton = () => {
 
     return (
         <button 
-            className={`px-4 py-2 ${config.cameraButtonColor} text-white rounded-lg shadow-md`}
+            className={`px-4 py-2 ${config?.cameraButtonColor} text-white rounded-lg shadow-md`}
             onClick={takePhoto}
             disabled={isCapturing}
         >
