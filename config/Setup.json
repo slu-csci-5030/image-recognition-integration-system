@@ -1,6 +1,6 @@
 {
     "cameraButtonColor": "bg-green-500",
-    "imageApiUrl": "example url"
+    "imageApiUrl": "example url",
 
     "appBackground": "bg-gray-900",
     "cameraButtonColor": "bg-blue-500",
