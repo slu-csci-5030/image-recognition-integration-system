@@ -20,7 +20,7 @@ const LoginScreen = () => {
             {/* Top Circle */}
             <div 
                 data-testid="top-circle"
-                className="absolute right-0 top-0 size-40 sm:size-48 md:size-64 -translate-y-1/2 translate-x-1/2 rounded-full bg-primary"
+                className="absolute right-0 top-0 size-40 -translate-y-1/2 translate-x-1/2 rounded-full bg-primary sm:size-48 md:size-64"
             />
 
             {/* Card */}
@@ -82,7 +82,7 @@ const LoginScreen = () => {
             {/* Bottom Decoration */}
             <div 
                 data-testid="bottom-decor"
-                className="absolute bottom-0 left-0 size-24 sm:size-32 md:size-40 translate-y-1/2 rotate-[-20deg] rounded-tr-xl bg-secondary"
+                className="absolute bottom-0 left-0 size-24 translate-y-1/2 rotate-[-20deg] rounded-tr-xl bg-secondary sm:size-32 md:size-40"
             />
         </div>
     );

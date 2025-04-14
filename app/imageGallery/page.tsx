@@ -101,14 +101,14 @@ function ImageGalleryContent() {
 
   return (
     <div className={`min-h-screen ${config.appBackground} ${config.textColor}`}>
-      <header className={`shadow border-b ${config.borderColor}`}>
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <header className={`border-b shadow ${config.borderColor}`}>
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
           <h1 className={`text-3xl font-bold ${config.headingColor}`}>Image Gallery</h1>
         </div>
       </header>
 
       <main>
-        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto sm:px-6 lg:px-8 py-6 max-w-7xl">
           {isSearching && (
             <div className={`text-center ${config.textColor}`}>
               Searching for similar images...
@@ -117,16 +117,16 @@ function ImageGalleryContent() {
 
           {similarImages.length > 0 && (
             <div>
-              <h2 className={`text-xl font-semibold mb-4 ${config.headingColor}`}>
+              <h2 className={`mb-4 text-xl font-semibold ${config.headingColor}`}>
                 Similar Images
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              <div className="gap-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {similarImages.map((image) => (
                   <img
                     key={image.src}
                     src={image.src}
                     alt={image.alt}
-                    className={`object-cover w-full h-40 rounded-md ${config.cardBackground}`}
+                    className={`h-40 w-full rounded-md object-cover ${config.cardBackground}`}
                   />
                 ))}
               </div>
@@ -134,7 +134,7 @@ function ImageGalleryContent() {
           )}
 
           {!isSearching && similarImages.length === 0 && (
-            <div className="text-center text-gray-500">No similar images found.</div>
+            <div className="text-gray-500 text-center">No similar images found.</div>
           )}
         </div>
       </main>
