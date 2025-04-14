@@ -14,7 +14,7 @@ export default function PreviousImages() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch('/api/config')
+    fetch('./setup.json')
       .then((res) => res.json())
       .then(setConfig)
       .catch(console.error);

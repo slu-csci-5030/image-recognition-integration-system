@@ -13,7 +13,7 @@ const CameraButton = () => {
     const [config, setConfig] = useState<AppConfig | null>(null);
 
     useEffect(() => {
-        fetch(`/api/config`)
+        fetch(`./setup.json`)
             .then((response) => response.json())
             .then((data) => {
                 setConfig(data);

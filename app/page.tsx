@@ -9,7 +9,7 @@ export default function Home() {
 
   const [config, setConfig] = useState<AppConfig | null>(null);
   useEffect(() => {
-    fetch(`/api/config`)
+    fetch(`./setup.json`)
       .then((response) => response.json())
       .then((data) => {
         setConfig(data);
@@ -23,7 +23,7 @@ export default function Home() {
 
 
   return (
-    <div className="relative flex h-screen items-center justify-center">
+    <div className="relative flex justify-center items-center h-screen">
       <div className={`flex flex-col items-center`}>
         <h1 className={`text-3xl font-semibold ${config?.textColor} mb-8 text-center`}>
           Click below to upload image

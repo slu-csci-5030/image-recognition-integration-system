@@ -8,11 +8,8 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   const [config, setConfig] = useState<AppConfig | null>(null);
 
   useEffect(() => {
-    fetch('/api/config')
-      .then((res) => {
-        if (!res.ok) throw new Error('Fetch failed');
-        return res.json();
-      })
+    fetch('./setup.json')
+      .then((res) => res.json())
       .then(setConfig)
       .catch((error) => console.error('Config load failed:', error));
   }, []);

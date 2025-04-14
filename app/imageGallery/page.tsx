@@ -19,7 +19,7 @@ function ImageGalleryContent() {
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
-    fetch('/api/config')
+    fetch('./setup.json')
       .then((response) => response.json())
       .then((data) => setConfig(data))
       .catch((error) => {
