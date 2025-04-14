@@ -1,4 +1,4 @@
-name: Build and Release Apps
+name: Release
 
 on:
   push:
@@ -7,121 +7,105 @@ on:
 
 permissions:
   contents: write
-  packages: write
-  issues: write
   pull-requests: write
 
+  
 jobs:
   release:
+    name: Run Semantic Release
     runs-on: ubuntu-latest
     outputs:
-      release_version: ${{ steps.semantic.outputs.new_release_version }}
+      tag_name: ${{ steps.get_tag.outputs.tag }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Checkout repo
+        uses: actions/checkout@v4
         with:
-          node-version: '20'
+          fetch-depth: 0 # Needed for semantic-release to detect tags
 
-      - name: Install Yarn
-        run: npm install -g yarn
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Run Semantic Release
-        id: semantic
+      - name: Run semantic-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+      - name: Get latest tag
+        id: get_tag
         run: |
-          npx semantic-release
-        # Outputs version (optional)
-        continue-on-error: true
+          git fetch --tags
+          latest_tag=$(git describe --tags --abbrev=0)
+          echo "tag=${latest_tag}" >> $GITHUB_OUTPUT
 
   android-build:
+    name: Android Build
     needs: release
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          node-version: '20'
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Build Android AAB
-        run: |
-          npx cap sync android
-          cd android
-          ./gradlew bundleRelease
+      - name: Build Web
+        run: yarn build
 
-      - name: Upload Android Artifact
-        uses: actions/upload-release-asset@v1
+      - name: Capacitor sync
+        run: yarn cap sync android
+
+      - name: Build Android APK
+        working-directory: ./android
+        run: ./gradlew assembleRelease
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ needs.release.outputs.release_url }}
-          asset_path: android/app/build/outputs/bundle/release/app-release.aab
-          asset_name: app-release-${{ needs.release.outputs.release_version }}.aab
-          asset_content_type: application/octet-stream
+          tag_name: ${{ needs.release.outputs.tag_name }}
+          name: Release ${{ needs.release.outputs.tag_name }}
+          files: |
+            android/app/build/outputs/apk/release/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 
-  ios-build:
-    needs: release
-    runs-on: macos-13
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Install CocoaPods
-        run: cd ios/App && pod install
-
-      - name: Setup Keychain and Provisioning
-        run: |
-          echo "${{ secrets.IOS_CERTIFICATE }}" | base64 --decode > cert.p12
-          echo "${{ secrets.IOS_PROFILE }}" | base64 --decode > profile.mobileprovision
-          security create-keychain -p "" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
-          security import cert.p12 -P ${{ secrets.IOS_CERTIFICATE_PASSWORD }} -A
-          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-
-      - name: Build iOS Archive
-        run: |
-          cd ios/App
-          xcodebuild -workspace App.xcworkspace \
-            -scheme App \
-            -configuration Release \
-            -archivePath $PWD/build/App.xcarchive \
-            -allowProvisioningUpdates archive
-
-      - name: Export IPA
-        run: |
-          cd ios/App
-          xcodebuild -exportArchive \
-            -archivePath $PWD/build/App.xcarchive \
-            -exportOptionsPlist exportOptions.plist \
-            -exportPath $PWD/build/IPA
-
-      - name: Upload iOS Artifact
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ needs.release.outputs.release_url }}
-          asset_path: ios/App/build/IPA/App.ipa
-          asset_name: App-${{ needs.release.outputs.release_version }}.ipa
-          asset_content_type: application/octet-stream
+  # ios-build:
+  #   name: iOS Build
+  #   needs: release
+  #   runs-on: macos-latest
+  #   steps:
+  #     - name: Checkout repo
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #
+  #     - name: Install dependencies
+  #       run: yarn install --frozen-lockfile
+  #
+  #     - name: Build Web
+  #       run: yarn build
+  #
+  #     - name: Capacitor sync
+  #       run: yarn cap sync ios
+  #
+  #     - name: Open iOS project in Xcode and export manually

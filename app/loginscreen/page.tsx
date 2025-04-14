@@ -1,15 +1,13 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, FormEvent } from 'react';
 
 const LoginScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    // Handle form submission
-    const handleSubmit = (e: any) => {
-        alert("submitted.")
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // For now, just log the values 
+        alert("submitted.");
         console.log('Email:', email);
         console.log('Password:', password);
     };
@@ -17,43 +15,40 @@ const LoginScreen = () => {
     return (
         <div 
             data-testid="login-container"
-            className="relative min-h-screen flex flex-col justify-center items-center bg-white px-4 sm:px-8 md:px-16 lg:px-32 overflow-hidden"
+            className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-white px-4 sm:px-8 md:px-16 lg:px-32"
         >
+            {/* Top Circle */}
             <div 
                 data-testid="top-circle"
-                className="
-                        absolute top-0 right-0 
-                        w-40 h-40 sm:w-48 sm:h-48 md:w-64 md:h-64 
-                        bg-primary rounded-full 
-                        translate-x-1/2
-                        -translate-y-1/2">
-            </div>
+                className="absolute right-0 top-0 size-40 sm:size-48 md:size-64 -translate-y-1/2 translate-x-1/2 rounded-full bg-primary"
+            />
 
-            <div data-testid="login-card" className="w-full sm:max-w-md z-10">
-                <h1 className="text-4xl font-bold mb-2 ">Irls</h1>
-                <h2 className="text-xl font-semibold mb-8">Login</h2>
+            {/* Card */}
+            <div data-testid="login-card" className="z-10 w-full sm:max-w-md">
+                <h1 className="mb-2 text-4xl font-bold">Irls</h1>
+                <h2 className="mb-8 text-xl font-semibold">Login</h2>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-lg mb-2">Email</label>
+                        <label className="mb-2 block text-lg">Email</label>
                         <input
                             data-testid="email-input"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full border-b border-black focus:outline-none text-base py-2"
+                            className="w-full border-b border-black py-2 text-base focus:outline-none"
                             placeholder="Enter your email"
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-lg mb-2">Password</label>
+                        <label className="mb-2 block text-lg">Password</label>
                         <input
                             data-testid="password-input"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full border-b border-black focus:outline-none text-base py-2"
+                            className="w-full border-b border-black py-2 text-base focus:outline-none"
                             placeholder="Enter your password"
                             required
                         />
@@ -67,26 +62,27 @@ const LoginScreen = () => {
                     <button
                         data-testid="sign-in-button"
                         type="submit"
-                        className="w-full bg-primary text-white text-lg py-3 rounded-2xl mt-4"
+                        className="mt-4 w-full rounded-2xl bg-primary py-3 text-lg text-white"
                     >
                         Sign In
                     </button>
                 </form>
 
                 <div className="mt-8 text-center text-sm">
-                    Don't have an account?{' '}
+                    Don&apos;t have an account?{' '}
                     <span 
                         data-testid="signup-text"
-                        className="text-blue-700 font-semibold cursor-pointer"
+                        className="cursor-pointer font-semibold text-blue-700"
                     >
                         Sign Up
                     </span>
                 </div>
             </div>
 
+            {/* Bottom Decoration */}
             <div 
                 data-testid="bottom-decor"
-                className="absolute bottom-0 left-0 w-24 h-24 bg-secondary rounded-tr-xl rotate-[-20deg] sm:w-32 h-32 md:w-40 h-40 translate-y-1/2"
+                className="absolute bottom-0 left-0 size-24 sm:size-32 md:size-40 translate-y-1/2 rotate-[-20deg] rounded-tr-xl bg-secondary"
             />
         </div>
     );
