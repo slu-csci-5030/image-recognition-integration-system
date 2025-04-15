@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  
 
   
 jobs:
@@ -33,7 +34,7 @@ jobs:
 
       - name: Run semantic-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npx semantic-release
 
       - name: Get latest tag
@@ -83,8 +84,7 @@ jobs:
         with:
           tag_name: ${{ needs.release.outputs.tag_name }}
           name: Release ${{ needs.release.outputs.tag_name }}
-          files: |
-            android/app/build/outputs/apk/release/app-release.aab
+          files: android/app/build/outputs/bundle/release/app-release.aab
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
