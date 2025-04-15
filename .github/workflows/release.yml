@@ -84,9 +84,9 @@ jobs:
           tag_name: ${{ needs.release.outputs.tag_name }}
           name: Release ${{ needs.release.outputs.tag_name }}
           files: |
-            android/app/build/outputs/apk/release/app-release.apk
+            android/app/build/outputs/apk/release/app-release.aab
         env:
-          GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
   # ios-build:
   #   name: iOS Build
