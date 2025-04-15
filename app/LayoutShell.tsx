@@ -11,10 +11,10 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
     fetch('./setup.json')
       .then((res) => res.json())
       .then(setConfig)
-      .catch(console.error);
+      .catch((error) => console.error('Config load failed:', error));
   }, []);
 
-  if (!config) return null;
+  if (!config) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading configuration...</div>;
 
   return (
     <div className={`${config.appBackground} ${config.textColor} min-h-screen`}>
