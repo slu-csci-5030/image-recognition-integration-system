@@ -73,8 +73,9 @@ jobs:
         run: yarn cap sync android
 
       - name: Build Android AAB
-        working-directory: ./android
-        run: ./gradlew assembleRelease
+        run: |
+          cd android
+          ./gradlew assembleRelease
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
