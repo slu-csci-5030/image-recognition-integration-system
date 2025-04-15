@@ -14,11 +14,10 @@
 /out/
 
 #ios files
-/ios/
+
 
 #android files
 
-/android/
 
 #capactior config
 capacitor.config.ts

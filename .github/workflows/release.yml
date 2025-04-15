@@ -72,7 +72,7 @@ jobs:
       - name: Capacitor sync
         run: yarn cap sync android
 
-      - name: Build Android APK
+      - name: Build Android AAB
         working-directory: ./android
         run: ./gradlew assembleRelease
 
