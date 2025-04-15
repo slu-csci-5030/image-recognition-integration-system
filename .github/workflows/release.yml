@@ -75,6 +75,7 @@ jobs:
       - name: Build Android AAB
         run: |
           cd android
+          chmod +x gradlew
           ./gradlew assembleRelease
 
       - name: Create GitHub Release
