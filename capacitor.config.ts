@@ -7,7 +7,11 @@ const config: CapacitorConfig = {
 
   plugins: {
     StatusBar: {
-      backgroundColor: ']',
+      backgroundColor: '#111827', // This should match your app's background color
+
+    },
+
+  }
 };
 
 export default config;
