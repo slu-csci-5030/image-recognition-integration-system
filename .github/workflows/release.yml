@@ -88,5 +88,6 @@ jobs:
           tag_name: ${{ needs.release.outputs.tag_name }}
           name: Release ${{ needs.release.outputs.tag_name }}
           files: android/app/build/outputs/apk/release/com.iris.app.apk
+          token: ${{ secrets.GH_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
