@@ -46,8 +46,8 @@ export default function PreviousImages() {
     return (
         <div className="flex min-h-screen flex-col">
   <header
-    className={`sticky top-0 z-10 border-b bg-opacity-95 backdrop-blur ${config?.appBackground} ${config?.borderColor}`}
-  >
+    className={`sticky top-0 z-10 border-b bg-opacity-95 pt-[env(safe-area-inset-top)] backdrop-blur ${config?.appBackground} ${config?.borderColor}`}
+      >
     <div className="container flex h-14 items-center">
       <div className="flex items-center gap-2">
         <Link href="/">
@@ -108,7 +108,7 @@ export default function PreviousImages() {
     </div>
   </main>
 
-  <footer className={`mb-16 border-t py-4 ${config?.borderColor}`}>
+  <footer className={`mb-16 border-t py-4 pb-[env(safe-area-inset-bottom)] ${config?.borderColor}`}>
     <div className="container flex items-center justify-between">
       <p className="text-xs text-gray-400">
       {images.length} items in history
