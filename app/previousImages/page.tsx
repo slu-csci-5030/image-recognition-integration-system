@@ -45,21 +45,26 @@ export default function PreviousImages() {
 
     return (
         <div className="flex min-h-screen flex-col">
-  <header
-    className={`sticky top-0 z-10 border-b bg-opacity-95 pt-[env(safe-area-inset-top)] backdrop-blur ${config?.appBackground} ${config?.borderColor}`}
-      >
-    <div className="container flex h-14 items-center">
-      <div className="flex items-center gap-2">
-        <Link href="/">
-          <button className={`hover:opacity-80 ${config?.buttonPrimary}`}>
-            <ArrowLeft className="size-5" />
-            <span className="sr-only">Back</span>
-          </button>
-        </Link>
-        <h1 className={`text-lg font-semibold ${config?.headingColor}`}>Search History</h1>
-      </div>
+  <header className={`sticky top-0 z-10 border-b bg-opacity-95 backdrop-blur ${config?.appBackground} ${config?.borderColor}`}>
+  <div
+    className="container flex items-center"
+    style={{
+      paddingTop: 'env(safe-area-inset-top)',
+      height: 'calc(56px + env(safe-area-inset-top))',
+    }}
+  >
+    <div className="flex items-center gap-2">
+      <Link href="/">
+        <button className={`hover:opacity-80 ${config?.buttonPrimary}`}>
+          <ArrowLeft className="size-5" />
+          <span className="sr-only">Back</span>
+        </button>
+      </Link>
+      <h1 className={`text-lg font-semibold ${config?.headingColor}`}>Search History</h1>
     </div>
-  </header>
+  </div>
+</header>
+
 
   <main className="flex-1">
     <div className="container py-4">
