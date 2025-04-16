@@ -14,7 +14,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       .catch((error) => console.error('Config load failed:', error));
   }, []);
 
-  if (!config) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading configuration...</div>;
+  if (!config) return <div className='align-middle text-white'>Loading configuration...</div>;
 
   return (
     <div className={`${config.appBackground} ${config.textColor} min-h-screen`}>

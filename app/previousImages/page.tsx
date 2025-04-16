@@ -44,11 +44,11 @@ export default function PreviousImages() {
 
 
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex min-h-screen flex-col">
   <header
-    className={`bg-opacity-95 sticky top-0 z-10 border-b backdrop-blur ${config?.appBackground} ${config?.borderColor}`}
+    className={`sticky top-0 z-10 border-b bg-opacity-95 backdrop-blur ${config?.appBackground} ${config?.borderColor}`}
   >
-    <div className="flex items-center h-14 container">
+    <div className="container flex h-14 items-center">
       <div className="flex items-center gap-2">
         <Link href="/">
           <button className={`hover:opacity-80 ${config?.buttonPrimary}`}>
@@ -62,8 +62,8 @@ export default function PreviousImages() {
   </header>
 
   <main className="flex-1">
-    <div className="py-4 container">
-        <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+    <div className="container py-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
           {images.map((item, index) => (
             <div
               key={index}
@@ -73,20 +73,20 @@ export default function PreviousImages() {
               <Image src={item.src || "/placeholder.svg"} alt={item.alt} fill className="object-cover" />
               </div>
               <div className="flex flex-col items-start gap-2 p-4">
-                <div className="flex justify-between w-full">
+                <div className="flex w-full justify-between">
                   <div>
-                  <h3 className="font-medium text-gray-400 line-clamp-1">{item.caption}</h3>
+                  <h3 className="line-clamp-1 font-medium text-gray-400">{item.caption}</h3>
                   </div>
                   <div className="flex gap-2">
                   <button
-                    className="hover:opacity-80 size-8 text-blue-400"
+                    className="size-8 text-blue-400 hover:opacity-80"
                     onClick={() => router.push(`/imageGallery?imageId=${item.id}`)}
                     >
                     <Search className="size-4" />
                     <span className="sr-only">Search again</span>
                     </button>
                     <button
-                        className="hover:opacity-80 size-8 text-red-500"
+                        className="size-8 text-red-500 hover:opacity-80"
                         onClick={async () => {
                             try {
                             await deleteImageFromIndexedDB(item.id);
@@ -108,9 +108,9 @@ export default function PreviousImages() {
     </div>
   </main>
 
-  <footer className={`border-t py-4 ${config?.borderColor}`}>
-    <div className="flex justify-between items-center container">
-      <p className="text-gray-400 text-xs">
+  <footer className={`mb-16 border-t py-4 ${config?.borderColor}`}>
+    <div className="container flex items-center justify-between">
+      <p className="text-xs text-gray-400">
       {images.length} items in history
       </p>
       <button
