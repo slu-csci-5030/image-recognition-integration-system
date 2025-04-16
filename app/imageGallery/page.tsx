@@ -17,6 +17,8 @@ function ImageGalleryContent() {
   const [config, setConfig] = useState<AppConfig | null>(null);
   const [similarImages, setSimilarImages] = useState<SimilarImage[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [imageData, setImageData] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('./setup.json')
@@ -45,6 +47,8 @@ function ImageGalleryContent() {
       getRequest.onsuccess = async () => {
         if (getRequest.result) {
           const base64Image = getRequest.result.data;
+          setImageData(base64Image);
+          setLoading(false);
           await sendPhotoToAPI(base64Image, config);
         } else {
           console.warn('No image found in IndexedDB with ID:', id);
@@ -109,6 +113,18 @@ function ImageGalleryContent() {
 
       <main>
         <div className="mx-auto sm:px-6 lg:px-8 py-6 max-w-7xl">
+          <h2 className='text-white font-medium text-xl ml-4 mb-2'>Queried image</h2>
+          {loading ? (
+            <p>Loading input image...</p>
+          ) : imageData ? (
+            <div className="w-[300px] h-[200px] mx-auto bg-gray-800 border border-gray-600 rounded-lg overflow-hidden flex items-center justify-center
+            ">
+              <img src={imageData} alt="Captured" className="rounded shadow-lg h-[100%] w-[100%] object-contain" />
+            </div>
+          ) : (
+            <p>No image found.</p>
+          )}
+
           {isSearching && (
             <div className={`text-center ${config.textColor}`}>
               Searching for similar images...
@@ -145,7 +161,9 @@ function ImageGalleryContent() {
 export default function ImageGallery() {
   return (
     <Suspense fallback={<div className="text-white text-center">Loading...</div>}>
+
       <ImageGalleryContent />
+
     </Suspense>
   );
 }
