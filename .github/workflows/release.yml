@@ -37,6 +37,7 @@ jobs:
         run: npx semantic-release
 
       - name: Get latest tag
+      
         id: get_tag
         run: |
           git fetch --tags
