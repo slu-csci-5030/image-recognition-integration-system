@@ -32,7 +32,7 @@ jobs:
 
       - name: Run semantic-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release
 
       - name: Get latest tag
@@ -89,4 +89,4 @@ jobs:
           name: Release ${{ needs.release.outputs.tag_name }}
           files: android/app/build/outputs/apk/release/com.iris.app.apk
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
