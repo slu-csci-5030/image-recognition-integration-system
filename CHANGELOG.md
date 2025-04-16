@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/oss-slu/image-recognition-integration-system/compare/v1.2.0...v1.3.0) (2025-04-16)
+
+
+### Features
+
+* I added the status bar plugin ([70f5773](https://github.com/oss-slu/image-recognition-integration-system/commit/70f577357d6dc0566e9c87b73e933851ea4ccd50))
+
 # [1.2.0](https://github.com/oss-slu/image-recognition-integration-system/compare/v1.1.1...v1.2.0) (2025-04-14)
 
 
