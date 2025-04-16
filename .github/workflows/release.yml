@@ -8,9 +8,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  
 
-  
 jobs:
   release:
     name: Run Semantic Release
@@ -73,41 +71,22 @@ jobs:
       - name: Capacitor sync
         run: yarn cap sync android
 
-      - name: Build Android AAB
+      - name: Build Android APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleRelease
+
+      - name: Rename APK for Release
+        run: |
+          mv android/app/build/outputs/apk/release/app-release-unsigned.apk \
+             android/app/build/outputs/apk/release/com.iris.app.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ needs.release.outputs.tag_name }}
           name: Release ${{ needs.release.outputs.tag_name }}
-          files: android/app/build/outputs/bundle/release/app-release.aab
+          files: android/app/build/outputs/apk/release/com.iris.app.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-
-  # ios-build:
-  #   name: iOS Build
-  #   needs: release
-  #   runs-on: macos-latest
-  #   steps:
-  #     - name: Checkout repo
-  #       uses: actions/checkout@v4
-  #
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 20
-  #
-  #     - name: Install dependencies
-  #       run: yarn install --frozen-lockfile
-  #
-  #     - name: Build Web
-  #       run: yarn build
-  #
-  #     - name: Capacitor sync
-  #       run: yarn cap sync ios
-  #
-  #     - name: Open iOS project in Xcode and export manually

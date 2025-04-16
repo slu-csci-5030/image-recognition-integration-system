@@ -113,7 +113,7 @@ export default function PreviousImages() {
     </div>
   </main>
 
-  <footer className={`mb-16 border-t py-4 pb-[env(safe-area-inset-bottom)] ${config?.borderColor}`}>
+  <footer className={`mb-16 border-t px-6 py-4 pb-[env(safe-area-inset-bottom)] ${config?.borderColor}`}>
     <div className="container flex items-center justify-between">
       <p className="text-xs text-gray-400">
       {images.length} items in history
