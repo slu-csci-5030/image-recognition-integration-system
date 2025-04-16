@@ -125,6 +125,7 @@ export default function PreviousImages() {
             await clearAllImagesFromIndexedDB();
             setImages([]); // Clear UI
             } catch (error) {
+              
             console.error("Failed to clear history:", error);
             }
         }}
