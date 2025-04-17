@@ -11,43 +11,50 @@ permissions:
 
 jobs:
   bump:
-    name: Bump Version PR
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # fetch all history & tags 
-
+          fetch-depth: 0   # ensure all tags & history are present
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'  # use Node.js 20 
+          node-version: '20'  # match your environment
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+      - run: yarn install --frozen-lockfile
 
-      - id: bump
-        name: Bump patch version
+      # 1️⃣ Calculate next version via dry-run
+      - id: calc
+        name: Calculate next semantic-release version
         run: |
-          new_version=$(npm version patch --no-git-tag-version)
-          echo "new_version=${new_version#v}" >> $GITHUB_OUTPUT
+          VERSION=$(npx semantic-release --dry-run --no-ci \
+            | grep 'The next release version is' \
+            | awk '{print $NF}')
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
-      - name: Create version bump Pull Request
-        id: create_pr
+      # 2️⃣ Bump package.json to that version
+      - name: Bump to ${{ steps.calc.outputs.version }}
+        run: |
+          npm version ${{ steps.calc.outputs.version }} --no-git-tag-version
+        env:
+          CI: false
+
+      # 3️⃣ Open & auto‑merge the PR
+      - id: create_pr
         uses: peter-evans/create-pull-request@v5
         with:
-          branch: "bump-version-${{ steps.bump.outputs.new_version }}"
-          title: "chore: bump version to ${{ steps.bump.outputs.new_version }}"
-          commit-message: ":bookmark: bump version to ${{ steps.bump.outputs.new_version }}"
-          body: "Automated version bump"
+          branch: bump-to-${{ steps.calc.outputs.version }}
+          title: "chore: bump to ${{ steps.calc.outputs.version }}"
+          commit-message: ":bookmark: bump to ${{ steps.calc.outputs.version }}"
+          body: "Automated bump to ${{ steps.calc.outputs.version }}"
 
-      - name: Enable auto-merge for bump PR
-        uses: peter-evans/enable-pull-request-automerge@v3
+      - uses: peter-evans/enable-pull-request-automerge@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           pull-request-number: ${{ steps.create_pr.outputs.pull-request-number }}
-          merge-method: squash 
+          merge-method: squash
 
   tag:
     name: Tag Release
