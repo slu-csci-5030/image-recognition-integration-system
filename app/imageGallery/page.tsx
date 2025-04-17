@@ -101,25 +101,24 @@ function ImageGalleryContent() {
     }
   };
 
-  if (!config) return <div className="text-white text-center">Loading config...</div>;
+  if (!config) return <div className="text-center text-white">Loading config...</div>;
 
   return (
     <div className={`min-h-screen ${config.appBackground} ${config.textColor}`}>
       <header className={`border-b shadow ${config.borderColor}`}>
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <h1 className={`text-3xl font-bold ${config.headingColor}`}>Image Gallery</h1>
         </div>
       </header>
 
       <main>
-        <div className="mx-auto sm:px-6 lg:px-8 py-6 max-w-7xl">
-          <h2 className='text-white font-medium text-xl ml-4 mb-2'>Queried image</h2>
+        <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+          <h2 className={`mb-2 ml-4 text-xl font-semibold ${config.headingColor}`}>Queried image</h2>
           {loading ? (
             <p>Loading input image...</p>
           ) : imageData ? (
-            <div className="w-[300px] h-[200px] mx-auto bg-gray-800 border border-gray-600 rounded-lg overflow-hidden flex items-center justify-center
-            ">
-              <img src={imageData} alt="Captured" className="rounded shadow-lg h-[100%] w-[100%] object-contain" />
+            <div className="mx-auto flex h-[200px] w-[300px] items-center justify-center overflow-hidden rounded-xl">
+              <img src={imageData} alt="Captured" className={`h-40 w-60 rounded-md object-cover ${config.cardBackground}`} />
             </div>
           ) : (
             <p>No image found.</p>
@@ -133,10 +132,10 @@ function ImageGalleryContent() {
 
           {similarImages.length > 0 && (
             <div>
-              <h2 className={`mb-4 text-xl font-semibold ${config.headingColor}`}>
+              <h2 className={`mb-4 ml-4 text-xl font-semibold ${config.headingColor}`}>
                 Similar Images
               </h2>
-              <div className="gap-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {similarImages.map((image) => (
                   <img
                     key={image.src}
@@ -150,7 +149,7 @@ function ImageGalleryContent() {
           )}
 
           {!isSearching && similarImages.length === 0 && (
-            <div className="text-gray-500 text-center">No similar images found.</div>
+            <div className="text-center text-gray-500">No similar images found.</div>
           )}
         </div>
       </main>
@@ -160,7 +159,7 @@ function ImageGalleryContent() {
 
 export default function ImageGallery() {
   return (
-    <Suspense fallback={<div className="text-white text-center">Loading...</div>}>
+    <Suspense fallback={<div className="text-center text-white">Loading...</div>}>
 
       <ImageGalleryContent />
 
