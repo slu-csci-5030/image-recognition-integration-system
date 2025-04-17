@@ -12,37 +12,56 @@ permissions:
 jobs:
   bump:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - run: yarn install --frozen-lockfile
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
+      # 1️⃣ Calculate next version via dry-run
       - id: calc
+        name: Calculate next semantic-release version
         run: |
           VERSION=$(npx semantic-release --dry-run --no-ci \
             | grep 'The next release version is' \
             | awk '{print $NF}')
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
-      - run: |
+      # 2️⃣ Bump version (no commit)
+      - name: Bump to version
+        run: |
           npm version ${{ steps.calc.outputs.version }} --no-git-tag-version
         env:
           CI: false
 
+      # 3️⃣ Check if any files changed
+      - name: Check if version bump changed anything
+        id: check_changes
+        run: |
+          git diff --quiet || echo "has_changes=true" >> $GITHUB_OUTPUT
+
+      # 4️⃣ Commit only if changes exist
       - name: Commit bumped version
+        if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add package.json
           git commit -m "chore: bump to ${{ steps.calc.outputs.version }}"
 
-      - id: create_pr
+      # 5️⃣ Open PR
+      - name: Create version bump PR
+        if: steps.check_changes.outputs.has_changes == 'true'
+        id: create_pr
         uses: peter-evans/create-pull-request@v5
         with:
           branch: bump-to-${{ steps.calc.outputs.version }}
@@ -50,7 +69,10 @@ jobs:
           commit-message: ":bookmark: bump to ${{ steps.calc.outputs.version }}"
           body: "Automated bump to ${{ steps.calc.outputs.version }}"
 
-      - uses: peter-evans/enable-pull-request-automerge@v3
+      # 6️⃣ Enable PR auto-merge
+      - name: Enable PR auto-merge
+        if: steps.check_changes.outputs.has_changes == 'true'
+        uses: peter-evans/enable-pull-request-automerge@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           pull-request-number: ${{ steps.create_pr.outputs.pull-request-number }}
@@ -62,16 +84,17 @@ jobs:
     needs: bump
     permissions:
       contents: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # ensure all tags & history are present 
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'  # match your environment 
+          node-version: '20'
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -91,6 +114,7 @@ jobs:
     name: Android Build
     runs-on: ubuntu-latest
     needs: tag
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
