@@ -45,21 +45,28 @@ export default function PreviousImages() {
 
     return (
         <div className="flex min-h-screen flex-col">
-  <header
-    className={`sticky top-0 z-10 border-b bg-opacity-95 backdrop-blur ${config?.appBackground} ${config?.borderColor}`}
+
+  <header className={`sticky top-0 z-10 border-b bg-opacity-95 backdrop-blur ${config?.appBackground} ${config?.borderColor}`}>
+  <div
+    className="container flex items-center"
+    style={{
+      paddingTop: 'env(safe-area-inset-top)',
+      height: 'calc(56px + env(safe-area-inset-top))',
+    }}
   >
-    <div className="container flex h-14 items-center">
-      <div className="flex items-center gap-2">
-        <Link href="/">
-          <button className={`hover:opacity-80 ${config?.buttonPrimary}`}>
-            <ArrowLeft className="size-5" />
-            <span className="sr-only">Back</span>
-          </button>
-        </Link>
-        <h1 className={`text-lg font-semibold ${config?.headingColor}`}>Search History</h1>
-      </div>
+    <div className="flex items-center gap-2">
+      <Link href="/">
+        <button className={`hover:opacity-80 ${config?.buttonPrimary}`}>
+          <ArrowLeft className="size-5" />
+          <span className="sr-only">Back</span>
+        </button>
+      </Link>
+      <h1 className={`text-lg font-semibold ${config?.headingColor}`}>Search History</h1>
+
     </div>
-  </header>
+  </div>
+</header>
+
 
   <main className="flex-1">
     <div className="container py-4">
@@ -108,7 +115,8 @@ export default function PreviousImages() {
     </div>
   </main>
 
-  <footer className={`border-t py-4 ${config?.borderColor}`}>
+
+  <footer className={`mb-16 border-t px-6 py-4 pb-[env(safe-area-inset-bottom)] ${config?.borderColor}`}>
     <div className="container flex items-center justify-between">
       <p className="text-xs text-gray-400">
       {images.length} items in history
@@ -120,6 +128,7 @@ export default function PreviousImages() {
             await clearAllImagesFromIndexedDB();
             setImages([]); // Clear UI
             } catch (error) {
+              
             console.error("Failed to clear history:", error);
             }
         }}

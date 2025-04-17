@@ -3,6 +3,7 @@ import localFont from 'next/font/local';
 import './globals.css';
 import LayoutShell from './LayoutShell';
 
+
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
   variable: '--font-geist-sans',
@@ -19,7 +20,11 @@ export const metadata: Metadata = {
   description: 'An image recognition system framework webapp',
 };
 
+
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+
+  
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>

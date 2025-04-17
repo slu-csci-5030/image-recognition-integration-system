@@ -350,7 +350,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 26SJ3TVCVG;
+				DEVELOPMENT_TEAM = CX27B49249;
 				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = IRIS;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
@@ -374,7 +374,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 26SJ3TVCVG;
+				DEVELOPMENT_TEAM = CX27B49249;
 				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = IRIS;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
