@@ -45,6 +45,7 @@ export default function PreviousImages() {
 
     return (
         <div className="flex min-h-screen flex-col">
+
   <header className={`sticky top-0 z-10 border-b bg-opacity-95 backdrop-blur ${config?.appBackground} ${config?.borderColor}`}>
   <div
     className="container flex items-center"
@@ -61,6 +62,7 @@ export default function PreviousImages() {
         </button>
       </Link>
       <h1 className={`text-lg font-semibold ${config?.headingColor}`}>Search History</h1>
+
     </div>
   </div>
 </header>
@@ -112,6 +114,7 @@ export default function PreviousImages() {
         </div>
     </div>
   </main>
+
 
   <footer className={`mb-16 border-t px-6 py-4 pb-[env(safe-area-inset-bottom)] ${config?.borderColor}`}>
     <div className="container flex items-center justify-between">
