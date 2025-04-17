@@ -1,4 +1,4 @@
-name: Full Release Pipeline
+name: Release
 
 on:
   push:
@@ -10,110 +10,44 @@ permissions:
   pull-requests: write
 
 jobs:
-  bump:
+  release:
+    name: Run Semantic Release
     runs-on: ubuntu-latest
+    outputs:
+      tag_name: ${{ steps.get_tag.outputs.tag }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
+        
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Needed for semantic-release to detect tags
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-
-      # 1️⃣ Calculate next version via dry-run
-      - id: calc
-        name: Calculate next semantic-release version
-        run: |
-          VERSION=$(npx semantic-release --dry-run --no-ci \
-            | grep 'The next release version is' \
-            | awk '{print $NF}')
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-
-      # 2️⃣ Bump version (no commit)
-      - name: Bump to version
-        run: |
-          npm version ${{ steps.calc.outputs.version }} --no-git-tag-version
+          
+      - name: Run semantic-release
         env:
-          CI: false
-
-      # 3️⃣ Check if any files changed
-      - name: Check if version bump changed anything
-        id: check_changes
-        run: |
-          git diff --quiet || echo "has_changes=true" >> $GITHUB_OUTPUT
-
-      # 4️⃣ Commit only if changes exist
-      - name: Commit bumped version
-        if: steps.check_changes.outputs.has_changes == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json
-          git commit -m "chore: bump to ${{ steps.calc.outputs.version }}"
-
-      # 5️⃣ Open PR
-      - name: Create version bump PR
-        if: steps.check_changes.outputs.has_changes == 'true'
-        id: create_pr
-        uses: peter-evans/create-pull-request@v5
-        with:
-          branch: bump-to-${{ steps.calc.outputs.version }}
-          title: "chore: bump to ${{ steps.calc.outputs.version }}"
-          commit-message: ":bookmark: bump to ${{ steps.calc.outputs.version }}"
-          body: "Automated bump to ${{ steps.calc.outputs.version }}"
-
-      # 6️⃣ Enable PR auto-merge
-      - name: Enable PR auto-merge
-        if: steps.check_changes.outputs.has_changes == 'true'
-        uses: peter-evans/enable-pull-request-automerge@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          pull-request-number: ${{ steps.create_pr.outputs.pull-request-number }}
-          merge-method: squash
-
-  tag:
-    name: Tag Release
-    runs-on: ubuntu-latest
-    needs: bump
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Run semantic-release to create tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release --no-ci
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npx semantic-release
 
       - name: Get latest tag
+      
         id: get_tag
         run: |
           git fetch --tags
-          echo "tag_name=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+          latest_tag=$(git describe --tags --abbrev=0)
+          echo "tag=${latest_tag}" >> $GITHUB_OUTPUT
 
   android-build:
     name: Android Build
+    needs: release
     runs-on: ubuntu-latest
-    needs: tag
 
     steps:
       - name: Checkout repo
@@ -145,6 +79,7 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleRelease
 
+
       - name: Rename APK for Release
         run: |
           mv android/app/build/outputs/apk/release/app-release-unsigned.apk \
@@ -153,8 +88,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ needs.tag.outputs.tag_name }}
-          name: Release ${{ needs.tag.outputs.tag_name }}
+          tag_name: ${{ needs.release.outputs.tag_name }}
+          name: Release ${{ needs.release.outputs.tag_name }}
           files: android/app/build/outputs/apk/release/com.iris.app.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
