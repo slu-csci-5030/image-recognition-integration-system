@@ -21,6 +21,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Needed for semantic-release to detect tags
+          persist-credentials: false
           token : ${{ secrets.GH_TOKEN }}
           
       - name: Setup Node.js
