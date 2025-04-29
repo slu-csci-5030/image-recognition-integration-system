@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import NavigationBar from '@/app/components/navigationBar';
 import { AppConfig } from '@/types/config';
+import { Capacitor } from '@capacitor/core';
 import { StatusBar } from '@capacitor/status-bar';
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
@@ -22,8 +23,11 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (!config) return;
-    StatusBar.setOverlaysWebView({ overlay: false }); // Prevents content from going behind Dynamic Island
-    StatusBar.setBackgroundColor({ color: `${config?.appBackground}` });
+
+    if (Capacitor.getPlatform() !== 'web') {
+      StatusBar.setOverlaysWebView({ overlay: false });
+      StatusBar.setBackgroundColor({ color: `${config?.appBackground}` });
+    }
   }, [config]);
   
 
