@@ -1,75 +1,160 @@
 # Contributing to IRIS
 
-We welcome contributions to the Image Recognition Integration System (IRIS)! Whether you're fixing bugs, adding features, improving documentation, or suggesting enhancements, your contributions are greatly appreciated.
+Thank you for your interest in contributing to the Image Recognition Integration System (IRIS)! We welcome bug reports, feature requests, code contributions, documentation improvements, and more. To make the contribution process smooth, please follow these guidelines.
 
-## Getting Started
+---
 
-1. **Fork the Repository**  
-   Navigate to the [IRIS GitHub repository](https://github.com/oss-slu/image-recognition-integration-system) and click on "Fork" to create a copy under your account.
+## Table of Contents
 
-2. **Clone Your Fork**  
-   Clone the forked repository to your local machine:
-   ```sh
-   git clone https://github.com/YOUR-USERNAME/IRIS.git
-   cd IRIS
+- [Contributing to IRIS](#contributing-to-iris)
+  - [Table of Contents](#table-of-contents)
+  - [Reporting Issues](#reporting-issues)
+  - [Development Setup](#development-setup)
+  - [Coding Standards](#coding-standards)
+  - [Branching Model](#branching-model)
+  - [Commit Messages](#commit-messages)
+  - [Pull Request Process](#pull-request-process)
+  - [Testing](#testing)
+  - [Documentation](#documentation)
+  - [Code of Conduct](#code-of-conduct)
+
+---
+
+## Reporting Issues
+
+1. Check existing [issues](https://github.com/oss-slu/image-recognition-integration-system/issues) to see if your bug or feature has already been reported.
+2. If not, open a new issue with a clear title and description.
+3. For bugs, include steps to reproduce, expected vs. actual behavior, and any relevant logs or screenshots.
+4. For feature requests, outline the use case, proposed behavior, and any mockups or examples.
+
+---
+
+## Development Setup
+
+1. Fork the repository on GitHub.  
+2. Clone your fork:  
+
+   ```bash
+   git clone https://github.com/<your-username>/image-recognition-integration-system.git
+   cd image-recognition-integration-system
    ```
 
-3. **Create a Branch**  
-   Before making any changes, create a new branch for your feature or fix:
-   ```sh
-   git checkout -b feature-branch-name
+3. Install dependencies:  
+
+   ```bash
+   npm install
+   # or
+   yarn install
    ```
 
-## Making Changes
+4. Start the development server:  
 
-- Follow the existing project structure and coding style.
-- Document your code where necessary.
-- Ensure that any changes or new features are well-tested.
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
 
-## Installing Dependencies
+5. Run the production build locally:  
 
-Make sure you have all dependencies installed before running or testing the project.
+   ```bash
+   npm run build && npm run export
+   ```
 
-### Frontend (Next.js / React)
-```sh
-npm install
-# or
-yarn install
+---
+
+## Coding Standards
+
+- **Language & Framework**: TypeScript, React (Next.js App Router), Capacitor.  
+- **Formatting**: Use Prettier for code formatting. Run `npm run format` before committing.  
+- **Linting**: ESLint is configured in the project. Run `npm run lint` to check for issues.  
+- **Styling**: Tailwind CSS utility classes are used for styling. Follow the existing conventions for class naming.
+
+---
+
+## Branching Model
+
+Use GitHub Flow:
+
+1. Create a new branch for each feature or bugfix:  
+
+   ```bash
+   git checkout -b feature/<issue-number>-short-description
+   ```
+
+2. Make commits to your branch.  
+3. Push your branch to your fork:  
+
+   ```bash
+   git push origin feature/<issue-number>-short-description
+   ```
+
+---
+
+## Commit Messages
+
+Follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+
+- **feat**: a new feature  
+- **fix**: a bug fix  
+- **docs**: documentation only changes  
+- **style**: formatting, missing semicolons, etc; no code changes  
+- **refactor**: code change that neither fixes a bug nor adds a feature  
+- **test**: adding missing tests or correcting existing tests  
+- **chore**: changes to the build process or auxiliary tools  
+
+Example:
+
+```
+feat(lib): add support for custom image metadata fields
 ```
 
-## Running the Project
+---
 
-```sh
-npm run dev
+## Pull Request Process
+
+1. Ensure your branch is up to date with `main`:  
+
+   ```bash
+   git fetch upstream
+   git rebase upstream/main
+   ```
+
+2. Run tests, linting, and formatting:  
+
+   ```bash
+   npm run lint && npm run format && npm test
+   ```
+
+3. Push your changes and open a pull request against the `main` branch of the upstream repository.  
+4. Fill out the PR template, including:
+   - Description of changes
+   - Related issue number
+   - Screenshots or screencasts (if relevant)  
+5. Address review feedback and iterate until approval.
+
+---
+
+## Testing
+
+*No automated tests are included yet.* Contributions to add unit tests or end-to-end tests are highly appreciated! When tests are present, run them with:
+
+```bash
+npm test
 # or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+yarn test
 ```
 
-## Submitting Your Contribution
+---
 
-1. **Commit Your Changes**  
-   Write clear and concise commit messages:
-   ```sh
-   git add .
-   git commit -m "Add feature: description"
-   ```
+## Documentation
 
-2. **Push Your Changes**  
-   ```sh
-   git push origin feature-branch-name
-   ```
+When modifying functionality or adding features, please update the documentation in `README.md`, `CONTRIBUTING.md`, and any page-specific docs. Ensure examples remain accurate.
 
-3. **Create a Pull Request**  
-   - Go to the [IRIS GitHub repository](https://github.com/oss-slu/image-recognition-integration-system).
-   - Click on "New Pull Request" and select your branch.
-   - Provide a meaningful title and description for your PR.
+---
 
 ## Code of Conduct
 
-By contributing, you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md) to ensure a respectful and inclusive environment for all contributors.
+This project adheres to the [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/version/2/0/code_of_conduct/). By participating, you agree to comply with its terms.
 
-Thank you for contributing to IRIS! 🚀
+```
