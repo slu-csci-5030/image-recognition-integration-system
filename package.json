@@ -23,6 +23,7 @@
     "axios": "^1.8.1",
     "formidable": "^3.5.2",
     "lucide-react": "^0.487.0",
+    "mongoose": "^8.15.1",
     "next": "^15.3.3",
     "react": "^18",
     "react-dom": "^18",
@@ -64,5 +65,8 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5.7.3",
     "whatwg-fetch": "^3.6.20"
+  },
+  "dependencies": {
+  "mongoose": "^7.0.0"
   }
 }
