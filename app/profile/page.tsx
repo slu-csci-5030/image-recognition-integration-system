@@ -11,6 +11,8 @@ export default function ProfilePage() {
   const user = {
     name: "Firstname Lastname",
     email: "firstnamelastname@example.com",
+    imagetype:"medical",
+    role:"developer"
   };
 
   return (
@@ -27,6 +29,19 @@ export default function ProfilePage() {
           <h2 className="text-xl font-semibold text-gray-700">Email</h2>
           <p className="text-gray-900">{user.email}</p>
         </div>
+        
+        
+        <div>
+          <h2 className="text-xl font-semibold text-gray-700">Role/Profession</h2>
+          <p className="text-gray-900">{user.role}</p>
+        </div>
+        
+
+        <div>
+          <h2 className="text-xl font-semibold text-gray-700">Type of Images</h2>
+          <p className="text-gray-900">{user.imagetype}</p>
+        </div>
+
       </div>
     </main>
   );
