@@ -7,6 +7,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { AppConfig } from '@/types/config';
+import { fetchHistory } from '@/app/Services/history';
+
 
 export default function PreviousImages() {
   const [images, setImages] = useState<{ id: string; src: string; alt: string; caption?: string }[]>([]);
@@ -142,4 +144,3 @@ export default function PreviousImages() {
         
       );
 };
-
