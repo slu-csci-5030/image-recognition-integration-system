@@ -30,6 +30,13 @@ const BottomNav = () => {
           <span className="text-xs">Previous Images</span>
         </div>
       </Link>
+      <Link href="/information-radiator">
+        <div className="flex cursor-pointer flex-col items-center text-gray-700">
+          <div className="size-6 rounded-full bg-gray-500"></div>
+          <span className="text-xs">Information Radiator</span>
+        </div>
+      </Link>
+
     </nav>
   );
 };
