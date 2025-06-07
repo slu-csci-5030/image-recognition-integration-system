@@ -1,8 +1,7 @@
 // app/services/rerumClient.ts
-
 const BASE_URL = "http://localhost:4000"; // TinyNode gateway
 
-export async function createAnnotation(data: object) {
+export async function createAnnotation(data:object) {
   const res = await fetch(`${BASE_URL}/create`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
