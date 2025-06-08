@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { AppConfig } from "@/types/config";
-
+import { createAnnotation } from "@/app/services/rerumClient";
 
 const CameraButton = () => {
     const router = useRouter();
@@ -21,9 +21,8 @@ const CameraButton = () => {
             .catch((error) => {
                 console.error("Error loading config:", error);
             });
-    }
-    , []);
-   
+    }, []);
+
     const takePhoto = async () => {
         try {
             setIsCapturing(true);
@@ -38,17 +37,23 @@ const CameraButton = () => {
             }
 
             console.log("Photo captured:", photo.webPath);
-            // Convert to Base64 before sending
             const base64Image = await convertToBase64(photo.webPath);
-            
-            // Generate a random UUID for this image
+
+            const rerumObject = {
+                type: "Image",
+                format: "image/jpeg",
+                value: base64Image,
+                creator: "https://example.org/obsa"
+            };
+
+            const rerumResponse = await createAnnotation(rerumObject);
+            const rerumId = rerumResponse["@id"];
+
             const imageId = uuidv4();
             console.log("Generated image ID:", imageId);
-            
-            // Store Base64 image in IndexedDB with UUID
-            await storeImageInIndexedDB(imageId, base64Image);
-            
-            // Redirect to Image Gallery with the UUID
+
+            await storeImageInIndexedDB(imageId, base64Image, rerumId);
+
             router.push(`/imageGallery?imageId=${imageId}`);
         } catch (error) {
             console.error("Camera error:", error);
@@ -66,7 +71,7 @@ const CameraButton = () => {
                     reader.readAsDataURL(blob);
                     reader.onloadend = () => {
                         if (typeof reader.result === "string") {
-                            resolve(reader.result); // Base64 string
+                            resolve(reader.result);
                         } else {
                             reject("Failed to convert image to Base64");
                         }
@@ -75,38 +80,35 @@ const CameraButton = () => {
                 .catch(error => reject(error));
         });
     };
-    
-    const storeImageInIndexedDB = (imageId: string, base64Image: string) => {
+
+    const storeImageInIndexedDB = (imageId: string, base64Image: string, rerumId: string) => {
         return new Promise<void>((resolve, reject) => {
             const request = indexedDB.open("ImageStorageDB", 1);
 
             request.onupgradeneeded = () => {
                 const db = request.result;
-    
-                // Only create object store if it doesn't exist
                 if (!db.objectStoreNames.contains("images")) {
-                    db.createObjectStore("images", { keyPath: "id" });
+                    const store = db.createObjectStore("images", { keyPath: "id" });
+                    store.createIndex("rerumId", "rerumId", { unique: false });
                 }
             };
-    
+
             request.onsuccess = () => {
                 const db = request.result;
-    
-                // Start a transaction to store the image
                 const transaction = db.transaction("images", "readwrite");
                 const store = transaction.objectStore("images");
-                
-                // Store the image with the generated UUID as the key
+
                 store.put({
                     id: imageId,
                     data: base64Image,
+                    rerumId,
                     timestamp: new Date().toISOString(),
                 });
-    
+
                 transaction.oncomplete = () => resolve();
                 transaction.onerror = (event) => reject(event);
             };
-    
+
             request.onerror = (event) => reject(event);
         });
     };
@@ -123,3 +125,4 @@ const CameraButton = () => {
 };
 
 export default CameraButton;
+

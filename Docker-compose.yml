@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  iris:
+    build:
+      context: .
+    ports:
+      - "3000:3000"  # IRIS frontend on localhost:3000
+    depends_on:
+      - tiny
+    environment:
+      - NEXT_PUBLIC_RERUM_GATEWAY=http://localhost:4000
+
+
+  rerum:
+    build:
+      context: ./rerum_server_nodejs
+    env_file:
+      - ./rerum_server_nodejs/.env
+    ports:
+      - "3002:3002"  # Host 3002 → Container 3002
+    depends_on:
+      - mongo
+    environment:
+      MONGO_CONNECTION_STRING: mongodb://mongo:27017
+      MONGODBNAME: rerumDB
+      MONGODBCOLLECTION: records
+      
+  tiny:
+    build:
+      context: ./TinyNode
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./TinyNode/.env
+    depends_on:
+      - rerum
+
+  mongo:
+    image: mongo:5.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
