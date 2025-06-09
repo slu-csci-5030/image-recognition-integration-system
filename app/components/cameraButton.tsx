@@ -1,125 +1,118 @@
-"use client";
+'use client';
 
-import { Camera, CameraResultType } from "@capacitor/camera";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { AppConfig } from "@/types/config";
+import React, { useEffect, useState, useRef } from 'react';
+import { Camera, CameraResultType } from '@capacitor/camera';
+import { useRouter } from 'next/navigation';
+import { v4 as uuidv4 } from 'uuid';
+import { AppConfig } from '@/types/config';
 
+export default function CameraButton() {
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-const CameraButton = () => {
-    const router = useRouter();
-    const [isCapturing, setIsCapturing] = useState(false);
-    const [config, setConfig] = useState<AppConfig | null>(null);
+  const [config, setConfig] = useState<AppConfig | null>(null);
+  const [loadingConfig, setLoadingConfig] = useState(true);
 
-    useEffect(() => {
-        fetch(`./setup.json`)
-            .then((response) => response.json())
-            .then((data) => {
-                setConfig(data);
-            })
-            .catch((error) => {
-                console.error("Error loading config:", error);
-            });
+  // Load theme/API config
+  useEffect(() => {
+    fetch('/setup.json')
+      .then((r) => r.json())
+      .then((data: AppConfig) => setConfig(data))
+      .catch(console.error)
+      .finally(() => setLoadingConfig(false));
+  }, []);
+
+  // Save image & navigate to gallery
+  const saveImageAndNavigate = (dataUrl: string) => {
+    const id = uuidv4();
+    const req = indexedDB.open('ImageStorageDB', 1);
+
+    req.onupgradeneeded = () =>
+      req.result.createObjectStore('images', { keyPath: 'id' });
+
+    req.onsuccess = () => {
+      const db = req.result;
+      const tx = db.transaction('images', 'readwrite');
+      tx.objectStore('images').put({ id, data: dataUrl });
+      tx.oncomplete = () => router.push(`/gallery?imageId=${id}`);
+      tx.onerror = console.error;
+    };
+
+    req.onerror = console.error;
+  };
+
+  // Camera capture
+  const takePhoto = async () => {
+    try {
+      const photo = await Camera.getPhoto({
+        quality: 90,
+        resultType: CameraResultType.DataUrl,
+      });
+      if (photo.dataUrl) saveImageAndNavigate(photo.dataUrl);
+    } catch (err) {
+      console.error('Camera error:', err);
     }
-    , []);
-   
-    const takePhoto = async () => {
-        try {
-            setIsCapturing(true);
-            const photo = await Camera.getPhoto({
-                quality: 100,
-                resultType: CameraResultType.Uri,
-                allowEditing: false,
-            });
+  };
 
-            if (!photo.webPath) {
-                throw new Error("Photo capture failed");
-            }
+  // File upload
+  const uploadImage = () => fileInputRef.current?.click();
 
-            console.log("Photo captured:", photo.webPath);
-            // Convert to Base64 before sending
-            const base64Image = await convertToBase64(photo.webPath);
-            
-            // Generate a random UUID for this image
-            const imageId = uuidv4();
-            console.log("Generated image ID:", imageId);
-            
-            // Store Base64 image in IndexedDB with UUID
-            await storeImageInIndexedDB(imageId, base64Image);
-            
-            // Redirect to Image Gallery with the UUID
-            router.push(`/imageGallery?imageId=${imageId}`);
-        } catch (error) {
-            console.error("Camera error:", error);
-        } finally {
-            setIsCapturing(false);
-        }
-    };
+  const onFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () =>
+      typeof reader.result === 'string' && saveImageAndNavigate(reader.result);
+    reader.readAsDataURL(file);
+  };
 
-    const convertToBase64 = (imageUri: string): Promise<string> => {
-        return new Promise((resolve, reject) => {
-            fetch(imageUri)
-                .then(response => response.blob())
-                .then(blob => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(blob);
-                    reader.onloadend = () => {
-                        if (typeof reader.result === "string") {
-                            resolve(reader.result); // Base64 string
-                        } else {
-                            reject("Failed to convert image to Base64");
-                        }
-                    };
-                })
-                .catch(error => reject(error));
-        });
-    };
-    
-    const storeImageInIndexedDB = (imageId: string, base64Image: string) => {
-        return new Promise<void>((resolve, reject) => {
-            const request = indexedDB.open("ImageStorageDB", 1);
+  if (loadingConfig || !config) {
+    return <div className="h-64 flex items-center justify-center text-white">Loading…</div>;
+  }
 
-            request.onupgradeneeded = () => {
-                const db = request.result;
-    
-                // Only create object store if it doesn't exist
-                if (!db.objectStoreNames.contains("images")) {
-                    db.createObjectStore("images", { keyPath: "id" });
-                }
-            };
-    
-            request.onsuccess = () => {
-                const db = request.result;
-    
-                // Start a transaction to store the image
-                const transaction = db.transaction("images", "readwrite");
-                const store = transaction.objectStore("images");
-                
-                // Store the image with the generated UUID as the key
-                store.put({
-                    id: imageId,
-                    data: base64Image,
-                    timestamp: new Date().toISOString(),
-                });
-    
-                transaction.oncomplete = () => resolve();
-                transaction.onerror = (event) => reject(event);
-            };
-    
-            request.onerror = (event) => reject(event);
-        });
-    };
+  return (
+    <div
+      className={`
+        w-full max-w-2xl
+        p-12 border-8 border-solid border-white
+        rounded-3xl ${config.cardBackground}
+      `}
+    >
+      {/* Only this prompt inside */}
+      <p className={`text-center text-3xl font-bold mb-10 ${config.textColor}`}>
+        Click below to upload image
+      </p>
 
-    return (
-        <button 
-            className={`px-4 py-2 ${config?.cameraButtonColor} rounded-lg text-white shadow-md`}
-            onClick={takePhoto}
-            disabled={isCapturing}
+      <div className="flex justify-center gap-8">
+        <button
+          onClick={takePhoto}
+          className={`
+            px-8 py-4 text-xl border-2 ${config.borderColor}
+            rounded-lg font-semibold hover:opacity-90 ${config.textColor}
+          `}
         >
-            {isCapturing ? "Capturing..." : "Use Camera"}
+          Take Photo
         </button>
-    );
-};
 
-export default CameraButton;
+        <button
+          onClick={uploadImage}
+          className={`
+            px-8 py-4 text-xl border-2 ${config.borderColor}
+            rounded-lg font-semibold hover:opacity-90 ${config.textColor}
+          `}
+        >
+          Upload Image
+        </button>
+      </div>
+
+      {/* Hidden file input */}
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        onChange={onFileSelected}
+        className="hidden"
+      />
+    </div>
+  );
+}
