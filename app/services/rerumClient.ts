@@ -71,3 +71,18 @@ export async function createRerumObject(data: object) {
     return res.json(); // returns object with @id
   }
   
+  export async function getAnnotationsByTarget(targetId: string) {
+    const res = await fetch(`${BASE_URL}/query`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        target: targetId,
+      }),
+    });
+  
+    if (!res.ok) {
+      throw new Error(`RERUM Query failed with status ${res.status}`);
+    }
+  
+    return res.json(); // should return an array of annotations
+  }
