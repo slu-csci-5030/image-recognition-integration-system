@@ -48,9 +48,9 @@ export default function ProfilePage() {
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === 'string') {
-        setForm(f => ({ ...f, pictureDataUrl: reader.result! }));
+        setForm(f => ({ ...f, pictureDataUrl: reader.result as string }));
       }
-    };
+    };    
     reader.readAsDataURL(file);
   };
 

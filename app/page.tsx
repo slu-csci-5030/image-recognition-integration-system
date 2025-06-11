@@ -12,6 +12,7 @@ export default function Home() {
   const [config, setConfig] = useState<AppConfig | null>(null);
   const [loadingConfig, setLoadingConfig] = useState(true);
   const [imageData, setImageData] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load config
@@ -19,7 +20,9 @@ export default function Home() {
     fetch('/setup.json')
       .then(r => r.json())
       .then((cfg: AppConfig) => setConfig(cfg))
-      .catch(console.error)
+      .catch(err => {
+        console.error('Failed to load config:', err);
+      })
       .finally(() => setLoadingConfig(false));
   }, []);
 
@@ -37,9 +40,7 @@ export default function Home() {
     }
   };
 
-  const uploadImage = () => {
-    fileInputRef.current?.click();
-  };
+  const uploadImage = () => fileInputRef.current?.click();
 
   const onFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -54,7 +55,9 @@ export default function Home() {
   };
 
   const handleSubmit = () => {
-    if (!imageData) return;
+    if (!imageData || typeof window === 'undefined') return;
+
+    setSaving(true);
     const id = uuidv4();
     const req = indexedDB.open('ImageStorageDB', 1);
 
@@ -67,40 +70,35 @@ export default function Home() {
       const tx = db.transaction('images', 'readwrite');
       const store = tx.objectStore('images');
       store.put({ id, data: imageData });
+
       tx.oncomplete = () => {
-        // Navigate to /imageGallery (folder name) with the imageId param
         router.push(`/imageGallery?imageId=${id}`);
       };
-      tx.onerror = e => console.error('IndexedDB write error:', e);
+      tx.onerror = (e) => {
+        console.error('Error writing to IndexedDB:', e);
+        setSaving(false);
+      };
     };
 
-    req.onerror = e => console.error('IndexedDB open error:', e);
+    req.onerror = (e) => {
+      console.error('Error opening IndexedDB:', e);
+      setSaving(false);
+    };
   };
 
   if (loadingConfig || !config) {
     return (
       <div className="h-screen flex items-center justify-center bg-gray-900">
-        <p className="text-white">Loading…</p>
+        <p className="text-white">Loading config…</p>
       </div>
     );
   }
 
   return (
     <div
-      className={`
-        min-h-screen ${config.appBackground}
-        flex flex-col items-center justify-center
-        px-4 py-8 relative
-      `}
+      className={`min-h-screen ${config.appBackground} flex flex-col items-center justify-center px-4 py-8 relative`}
     >
-      {/* Upload box */}
-      <div
-        className={`
-          w-full max-w-2xl
-          p-8 border-4 border-solid border-white
-          rounded-2xl ${config.cardBackground}
-        `}
-      >
+      <div className={`w-full max-w-2xl p-8 border-4 rounded-2xl ${config.cardBackground} border-white`}>
         <p className={`text-center text-3xl font-bold mb-8 ${config.textColor}`}>
           Click below to upload image
         </p>
@@ -108,20 +106,13 @@ export default function Home() {
         <div className="flex justify-center gap-8 mb-8">
           <button
             onClick={takePhoto}
-            className={`
-              px-8 py-4 text-xl border-2 ${config.borderColor}
-              rounded-lg font-semibold hover:opacity-90 ${config.textColor}
-            `}
+            className={`px-8 py-4 text-xl border-2 rounded-lg font-semibold hover:opacity-90 ${config.borderColor} ${config.textColor}`}
           >
             Take Photo
           </button>
-
           <button
             onClick={uploadImage}
-            className={`
-              px-8 py-4 text-xl border-2 ${config.borderColor}
-              rounded-lg font-semibold hover:opacity-90 ${config.textColor}
-            `}
+            className={`px-8 py-4 text-xl border-2 rounded-lg font-semibold hover:opacity-90 ${config.borderColor} ${config.textColor}`}
           >
             Upload Image
           </button>
@@ -137,31 +128,21 @@ export default function Home() {
 
         {imageData ? (
           <div className="mx-auto mb-8 w-[300px] h-[200px] overflow-hidden rounded-xl">
-            <img
-              src={imageData}
-              alt="Preview"
-              className="w-full h-full object-cover"
-            />
+            <img src={imageData} alt="Preview" className="w-full h-full object-cover" />
           </div>
         ) : (
           <p className={`text-center ${config.textColor}`}>No image selected.</p>
         )}
       </div>
 
-      {/* Submit button outside the box */}
       <button
         onClick={handleSubmit}
-        className={`
-          mt-8 px-10 py-3 text-lg font-semibold
-          border-2 rounded-md
-          ${config.borderColor} ${config.textColor}
-          hover:opacity-90
-        `}
+        disabled={saving}
+        className={`mt-8 px-10 py-3 text-lg font-semibold border-2 rounded-md ${config.borderColor} ${config.textColor} hover:opacity-90`}
       >
-        Submit
+        {saving ? 'Saving…' : 'Submit'}
       </button>
 
-      {/* Navigation bar */}
       <div className="absolute bottom-0 left-0 w-full">
         <NavigationBar />
       </div>

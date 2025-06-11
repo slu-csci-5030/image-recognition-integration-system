@@ -15,7 +15,7 @@ import {
   getAnnotationsByTarget,
   updateAnnotation,
   deleteAnnotation,
-} from '@/app/services/rerum';
+} from '@/app/services/rerumClient';
 
 export default function PreviousImages() {
   const [images, setImages] = useState<
