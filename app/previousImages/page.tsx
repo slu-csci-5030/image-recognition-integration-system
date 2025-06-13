@@ -1,5 +1,4 @@
 'use client';
-
 import { ArrowLeft, Trash2, PlusCircle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -16,7 +15,11 @@ import {
   updateAnnotation,
   deleteAnnotation,
 } from '@/app/services/rerumClient';
-
+import {
+  categoryOptions,
+  imageQualityOptions,
+  annotationFormFields,
+} from '@/types/metadata';
 export default function PreviousImages() {
   const [images, setImages] = useState<
     { id: string; src: string; alt: string; caption: string }[]
@@ -30,21 +33,16 @@ export default function PreviousImages() {
   const [newAnnotatedBy, setNewAnnotatedBy] = useState<Record<string, string>>({});
   const [config, setConfig] = useState<AppConfig | null>(null);
   const router = useRouter();
-
-  const categoryOptions = ['Medical', 'Environmental', 'Educational', 'Biological', 'Technical', 'Other'];
-
   useEffect(() => {
     fetch('./setup.json')
       .then((res) => res.json())
       .then(setConfig)
       .catch(console.error);
   }, []);
-
   useEffect(() => {
     const fetchImagesAndAnnotations = async () => {
       try {
         const storedImages = await loadStoredImages();
-
         const formatted = storedImages.map((img) => {
           const timestamp = img.timestamp ? new Date(img.timestamp) : new Date();
           return {
@@ -54,16 +52,13 @@ export default function PreviousImages() {
             caption: timestamp.toLocaleString(),
           };
         });
-
         setImages(formatted);
-
         const anns: Record<string, any> = {};
         for (const img of storedImages) {
           const results = await getAnnotationsByTarget(img.id);
           if (results.length > 0) {
             const ann = results[0];
             anns[img.id] = ann;
-
             setNewTitles((prev) => ({ ...prev, [img.id]: ann.body?.title || '' }));
             setNewTags((prev) => ({ ...prev, [img.id]: (ann.body?.tags || []).join(', ') }));
             setNewCategories((prev) => ({ ...prev, [img.id]: ann.body?.category || '' }));
@@ -79,7 +74,6 @@ export default function PreviousImages() {
 
     fetchImagesAndAnnotations();
   }, []);
-
   const handleSaveAnnotation = async (imageId: string) => {
     const title = newTitles[imageId] || '';
     const tags = (newTags[imageId] || '')
@@ -89,16 +83,13 @@ export default function PreviousImages() {
     const category = newCategories[imageId] || '';
     const imageQuality = newImageQuality[imageId] || '';
     const annotatedBy = newAnnotatedBy[imageId] || '';
-
     const existingAnnotation = annotations[imageId];
-
     const annotationPayload = {
       '@context': 'http://www.w3.org/ns/anno.jsonld',
       type: 'Annotation',
       target: imageId,
       body: { title, tags, category, imageQuality, annotatedBy },
     };
-
     try {
       let savedAnnotation;
       if (existingAnnotation && existingAnnotation['@id']) {
@@ -109,7 +100,6 @@ export default function PreviousImages() {
       } else {
         savedAnnotation = await createAnnotation(annotationPayload);
       }
-
       setAnnotations((prev) => ({ ...prev, [imageId]: savedAnnotation }));
       setEditingImageId(null);
       alert('Annotation saved successfully!');
@@ -118,7 +108,6 @@ export default function PreviousImages() {
       alert('Failed to save annotation.');
     }
   };
-
   const handleDeleteAnnotation = async (imageId: string, showAlert: boolean = true) => {
     const ann = annotations[imageId];
     if (ann && ann['@id']) {
@@ -130,7 +119,6 @@ export default function PreviousImages() {
         return;
       }
     }
-
     setAnnotations((prev) => {
       const copy = { ...prev };
       delete copy[imageId];
@@ -142,27 +130,23 @@ export default function PreviousImages() {
     setNewImageQuality((prev) => ({ ...prev, [imageId]: '' }));
     setNewAnnotatedBy((prev) => ({ ...prev, [imageId]: '' }));
     setEditingImageId(null);
-
     if (showAlert) alert('Annotation deleted successfully.');
   };
-
   const updateField = (
-    label: 'Title' | 'Tags' | 'Category' | 'Image Quality' | 'Annotated By',
+    fieldId: 'title' | 'tags' | 'category' | 'imageQuality' | 'annotatedBy',
     imageId: string,
     value: string
   ) => {
     const stateMap = {
-      Title: [newTitles, setNewTitles] as const,
-      Tags: [newTags, setNewTags] as const,
-      Category: [newCategories, setNewCategories] as const,
-      'Image Quality': [newImageQuality, setNewImageQuality] as const,
-      'Annotated By': [newAnnotatedBy, setNewAnnotatedBy] as const,
+      title: setNewTitles,
+      tags: setNewTags,
+      category: setNewCategories,
+      imageQuality: setNewImageQuality,
+      annotatedBy: setNewAnnotatedBy,
     };
-
-    const [, setter] = stateMap[label];
-    setter((prev) => ({ ...prev, [imageId]: value }));
+    const setter = stateMap[fieldId];
+    setter((prev: Record<string, string>) => ({ ...prev, [imageId]: value }));
   };
-
   return (
     <div className="flex min-h-screen flex-col">
       <header className={`sticky top-0 z-10 border-b bg-opacity-95 backdrop-blur ${config?.appBackground} ${config?.borderColor}`}>
@@ -177,7 +161,6 @@ export default function PreviousImages() {
           </div>
         </div>
       </header>
-
       <main className="flex-1">
         <div className="container py-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
@@ -186,7 +169,6 @@ export default function PreviousImages() {
                 <div className="relative aspect-video">
                   <Image src={item.src || '/placeholder.svg'} alt={item.alt} fill className="object-cover" />
                 </div>
-
                 <div className="flex flex-col items-start gap-2 p-4 relative">
                   <div className="flex w-full justify-between">
                     <h3 className="line-clamp-1 font-medium text-gray-400">{item.caption || 'No timestamp available'}</h3>
@@ -204,7 +186,6 @@ export default function PreviousImages() {
                       <Trash2 className="size-4" />
                     </button>
                   </div>
-
                   <button
                     className="flex items-center gap-1 text-sm text-indigo-500 hover:underline mt-2"
                     onClick={() => setEditingImageId(editingImageId === item.id ? null : item.id)}
@@ -212,32 +193,35 @@ export default function PreviousImages() {
                     <PlusCircle className="size-4" />
                     {annotations[item.id] ? 'Edit Annotation' : 'Add Annotation'}
                   </button>
-
                   {editingImageId === item.id && (
                     <div className="mt-2 w-full bg-gray-800 p-3 rounded-md text-sm space-y-2">
-                      {['Title', 'Tags', 'Annotated By'].map((label) => (
-                        <div key={label}>
-                          <label className="block mb-1 font-semibold text-gray-300">{label}</label>
-                          <input
-                            type="text"
-                            placeholder={label === 'Tags' ? 'Comma-separated' : ''}
-                            className="w-full p-2 rounded bg-gray-700 text-white"
-                            value={
-                              label === 'Title' ? newTitles[item.id] || '' :
-                              label === 'Tags' ? newTags[item.id] || '' :
-                              newAnnotatedBy[item.id] || ''
-                            }
-                            onChange={(e) => updateField(label as any, item.id, e.target.value)}
-                          />
-                        </div>
-                      ))}
-
+                      {/* Dynamically render text input fields using annotationFormFields */}
+                      {annotationFormFields.map((field) => {
+                        const valueMap = {
+                          title: newTitles,
+                          tags: newTags,
+                          annotatedBy: newAnnotatedBy,
+                        };
+                        const currentValue = valueMap[field.id as keyof typeof valueMap]?.[item.id] || '';
+                        return (
+                          <div key={field.id}>
+                            <label className="block mb-1 font-semibold text-gray-300">{field.label}</label>
+                            <input
+                              type={field.type}
+                              placeholder={field.placeholder}
+                              className="w-full p-2 rounded bg-gray-700 text-white"
+                              value={currentValue}
+                              onChange={(e) => updateField(field.id as 'title' | 'tags' | 'annotatedBy', item.id, e.target.value)}
+                            />
+                          </div>
+                        );
+                      })}
                       <div>
                         <label className="block mb-1 font-semibold text-gray-300">Category</label>
                         <select
                           className="w-full p-2 rounded bg-gray-700 text-white"
                           value={newCategories[item.id] || ''}
-                          onChange={(e) => updateField('Category', item.id, e.target.value)}
+                          onChange={(e) => updateField('category', item.id, e.target.value)}
                         >
                           <option value="">Select Category</option>
                           {categoryOptions.map((option) => (
@@ -245,29 +229,26 @@ export default function PreviousImages() {
                           ))}
                         </select>
                       </div>
-
                       <div>
                         <label className="block mb-1 font-semibold text-gray-300">Image Quality</label>
                         <select
                           className="w-full p-2 rounded bg-gray-700 text-white"
                           value={newImageQuality[item.id] || ''}
-                          onChange={(e) => updateField('Image Quality', item.id, e.target.value)}
+                          onChange={(e) => updateField('imageQuality', item.id, e.target.value)}
                         >
                           <option value="">Select Quality</option>
-                          <option value="Excellent">Excellent</option>
-                          <option value="Good">Good</option>
-                          <option value="Fair">Fair</option>
-                          <option value="Poor">Poor</option>
+                          {/* Dynamically render image quality options */}
+                          {imageQualityOptions.map((option) => (
+                            <option key={option} value={option}>{option}</option>
+                          ))}
                         </select>
                       </div>
-
                       <div className="flex flex-wrap gap-2 pt-2">
                         <button className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition" onClick={() => handleSaveAnnotation(item.id)}>Save</button>
                         <button className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition" onClick={() => handleDeleteAnnotation(item.id)}>Delete</button>
                       </div>
                     </div>
                   )}
-
                   {annotations[item.id] && editingImageId !== item.id && (
                     <div className="text-gray-300 mt-2 text-xs max-h-28 overflow-y-scroll pr-2 space-y-1">
                       <p><span className="font-bold text-gray-400">Title:</span> {annotations[item.id].body?.title}</p>
